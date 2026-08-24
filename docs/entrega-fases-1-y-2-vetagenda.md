@@ -129,6 +129,20 @@ La fase 2 contempla un primer conjunto de operaciones CRUD para demostrar el tra
 
 Estas operaciones son un avance académico inicial. No representan todavía la versión final del sistema ni deben interpretarse como un sistema clínico listo para producción.
 
+### 3.6 Evidencia de implementación
+
+La fase 2 quedó implementada en el repositorio mediante cuatro modelos ORM, una migración inicial, cuatro formularios, vistas para listados y operaciones, plantillas HTML personalizadas y registros en el panel administrativo. Para facilitar la revisión, el proyecto incluye el comando `python manage.py cargar_demo`, que carga propietarios, mascotas, veterinarios y citas ficticios sin duplicarlos.
+
+La verificación técnica se realizó con los siguientes comandos:
+
+```bash
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test
+```
+
+El resultado fue satisfactorio: Django no reportó problemas de configuración, no se detectaron migraciones pendientes y se ejecutaron siete pruebas correctamente. También se verificaron en el navegador el panel principal, el listado de propietarios y el formulario de registro de citas. El detalle de esta revisión se encuentra en `docs/verificacion-fase-2.md`.
+
 ## 4. Criterios de personalización
 
 VetAgenda no conserva las categorías de productos, bebidas, cocina o pedidos de la cafetería de ejemplo. El dominio se adaptó a la gestión veterinaria y sus modelos se enfocan en propietarios, mascotas, veterinarios y citas. La interfaz utiliza lenguaje relacionado con una clínica veterinaria y la documentación explica un flujo de atención diferente al de un restaurante.
