@@ -1,6 +1,7 @@
-from datetime import date, time
+from datetime import time, timedelta
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from citas.models import Cita, Mascota, Propietario, Veterinario
 
@@ -59,10 +60,11 @@ class Command(BaseCommand):
                 "activo": True,
             },
         )
+        hoy = timezone.localdate()
         Cita.objects.get_or_create(
             mascota=luna,
             veterinario=dra_sofia,
-            fecha=date(2026, 9, 10),
+            fecha=hoy,
             hora=time(10, 30),
             defaults={
                 "motivo": "Revisión general",
@@ -73,7 +75,7 @@ class Command(BaseCommand):
         Cita.objects.get_or_create(
             mascota=max,
             veterinario=dr_diego,
-            fecha=date(2026, 9, 11),
+            fecha=hoy + timedelta(days=1),
             hora=time(12, 0),
             defaults={
                 "motivo": "Vacunación anual",

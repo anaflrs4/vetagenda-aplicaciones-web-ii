@@ -33,10 +33,14 @@ La separación completa de permisos por rol se continuará en fases posteriores.
 | Mascotas | Listar, buscar, registrar, editar y eliminar mascotas relacionadas con un propietario. |
 | Veterinarios | Listar, buscar, registrar, editar y eliminar personal veterinario. |
 | Citas | Listar, buscar, filtrar por estado, registrar, ver detalle, editar y eliminar citas. |
-| Validación | Evitar que un veterinario tenga dos citas en la misma fecha y hora. |
+| Agenda de hoy | Mostrar solo las citas del día actual y filtrarlas por veterinario activo. |
+| Dashboard | Mostrar tarjetas con colores para solicitada, confirmada, atendida y cancelada. |
+| Validación | Evitar citas activas solapadas para un mismo veterinario, considerando una duración de 30, 45 o 60 minutos. |
 | Administración | Gestionar las cuatro entidades desde `/admin/` mediante el panel de Django. |
 
 Los datos incluidos con el comando de demostración son ficticios. No se utilizan pacientes ni propietarios reales.
+
+Las reglas de acceso, los estados y la gestión de horarios están documentadas en `docs/reglas-acceso-horarios.md`. En la fase actual se incluye la vista `/citas/hoy/` como aproximación a la agenda diaria del personal veterinario; la autenticación por usuario y los permisos específicos se implementarán cuando correspondan a una fase posterior.
 
 ## Tecnologías
 
@@ -66,6 +70,8 @@ vetagenda/
 ├── docs/
 │   ├── entrega-fases-1-y-2-vetagenda.md
 │   ├── fase-1-analisis-vetagenda.md
+│   ├── reglas-acceso-horarios.md
+│   ├── guion-video-fase-2.md
 │   └── verificacion-fase-2.md
 ├── vetagenda/
 │   ├── settings.py
@@ -96,7 +102,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Abre `http://127.0.0.1:8000/` para ver el panel de VetAgenda.
+Abre `http://127.0.0.1:8000/` para ver el panel de VetAgenda. La agenda diaria se encuentra en `http://127.0.0.1:8000/citas/hoy/`.
 
 ### Datos ficticios para la demostración
 
@@ -116,7 +122,7 @@ Después abre `http://127.0.0.1:8000/admin/` e inicia sesión con las credencial
 
 ## Pruebas
 
-El proyecto incluye pruebas para la pantalla inicial, las relaciones del modelo, la validación de horarios duplicados, el registro de citas, el filtro por estado y el listado de mascotas. Para ejecutarlas:
+El proyecto incluye diez pruebas para la pantalla inicial, las relaciones del modelo, la validación de horarios duplicados y solapados, el registro de citas, el filtro por estado, el listado de mascotas, la agenda diaria y el resumen del dashboard. Para ejecutarlas:
 
 ```bash
 python manage.py check

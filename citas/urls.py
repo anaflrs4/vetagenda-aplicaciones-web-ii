@@ -44,6 +44,7 @@ urlpatterns = [
         name="veterinario_eliminar",
     ),
     path("citas/", views.citas, name="citas"),
+    path("citas/hoy/", views.agenda_hoy, name="agenda_hoy"),
     path("citas/nueva/", views.cita_nueva, name="cita_nueva"),
     path("citas/<int:pk>/", views.cita_detalle, name="cita_detalle"),
     path("citas/<int:pk>/editar/", views.cita_editar, name="cita_editar"),

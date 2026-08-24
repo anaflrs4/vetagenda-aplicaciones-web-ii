@@ -25,7 +25,7 @@ class VeterinarioAdmin(admin.ModelAdmin):
 
 @admin.register(Cita)
 class CitaAdmin(admin.ModelAdmin):
-    list_display = ("fecha", "hora", "mascota", "veterinario", "estado")
+    list_display = ("fecha", "hora", "duracion_minutos", "mascota", "veterinario", "estado")
     list_filter = ("estado", "fecha", "veterinario")
     search_fields = (
         "mascota__nombre",

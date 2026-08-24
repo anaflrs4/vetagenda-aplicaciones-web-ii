@@ -1,7 +1,8 @@
-from datetime import date, time
+from datetime import date, time, timedelta
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from .forms import CitaForm
 from .models import Cita, Mascota, Propietario, Veterinario
@@ -65,13 +66,38 @@ class ModelosVetAgendaTests(VetAgendaDatosMixin, TestCase):
                 "veterinario": self.veterinario.pk,
                 "fecha": "2026-09-10",
                 "hora": "10:30",
+                "duracion_minutos": 30,
                 "motivo": "Consulta repetida",
                 "estado": Cita.Estado.SOLICITADA,
                 "observaciones": "",
             }
         )
         self.assertFalse(otro_form.is_valid())
-        self.assertIn("ya tiene una cita", str(otro_form.errors))
+        self.assertIn("solapa", str(otro_form.errors))
+
+    def test_el_formulario_rechaza_solapamiento_parcial(self):
+        Cita.objects.create(
+            mascota=self.mascota,
+            veterinario=self.veterinario,
+            fecha=date(2026, 9, 10),
+            hora=time(10, 0),
+            duracion_minutos=60,
+            motivo="Consulta larga",
+        )
+        otro_form = CitaForm(
+            data={
+                "mascota": self.mascota.pk,
+                "veterinario": self.veterinario.pk,
+                "fecha": "2026-09-10",
+                "hora": "10:30",
+                "duracion_minutos": 30,
+                "motivo": "Consulta solapada",
+                "estado": Cita.Estado.SOLICITADA,
+                "observaciones": "",
+            }
+        )
+        self.assertFalse(otro_form.is_valid())
+        self.assertIn("solapa", str(otro_form.errors))
 
 
 class FlujoVetAgendaTests(VetAgendaDatosMixin, TestCase):
@@ -86,6 +112,7 @@ class FlujoVetAgendaTests(VetAgendaDatosMixin, TestCase):
                 "veterinario": self.veterinario.pk,
                 "fecha": "2026-09-12",
                 "hora": "11:00",
+                "duracion_minutos": 30,
                 "motivo": "Vacunación",
                 "estado": Cita.Estado.CONFIRMADA,
                 "observaciones": "Aplicar vacuna anual.",
@@ -114,6 +141,46 @@ class FlujoVetAgendaTests(VetAgendaDatosMixin, TestCase):
         response = self.client.get(reverse("citas:mascotas"))
         self.assertContains(response, "Luna")
         self.assertContains(response, "Ana López")
+
+    def test_la_agenda_hoy_solo_muestra_la_fecha_actual(self):
+        hoy = timezone.localdate()
+        Cita.objects.create(
+            mascota=self.mascota,
+            veterinario=self.veterinario,
+            fecha=hoy,
+            hora=time(8, 0),
+            motivo="Cita de hoy",
+        )
+        otra_mascota = Mascota.objects.create(
+            propietario=self.propietario,
+            nombre="Nube",
+            especie=Mascota.Especie.PERRO,
+        )
+        Cita.objects.create(
+            mascota=otra_mascota,
+            veterinario=self.veterinario,
+            fecha=hoy + timedelta(days=1),
+            hora=time(9, 0),
+            motivo="Cita futura",
+        )
+        response = self.client.get(reverse("citas:agenda_hoy"))
+        self.assertContains(response, "Cita de hoy")
+        self.assertNotContains(response, "Cita futura")
+
+    def test_el_dashboard_muestra_el_resumen_por_estado(self):
+        Cita.objects.create(
+            mascota=self.mascota,
+            veterinario=self.veterinario,
+            fecha=date(2026, 9, 20),
+            hora=time(14, 0),
+            motivo="Consulta confirmada",
+            estado=Cita.Estado.CONFIRMADA,
+        )
+        response = self.client.get(reverse("citas:inicio"))
+        self.assertContains(response, "Solicitada")
+        self.assertContains(response, "Confirmada")
+        self.assertContains(response, "Atendida")
+        self.assertContains(response, "Cancelada")
 
     def test_las_secciones_principales_cargan(self):
         rutas = [

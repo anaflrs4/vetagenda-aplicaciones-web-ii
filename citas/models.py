@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -100,6 +103,11 @@ class Cita(models.Model):
     )
     fecha = models.DateField("fecha")
     hora = models.TimeField("hora")
+    duracion_minutos = models.PositiveSmallIntegerField(
+        "duración en minutos",
+        choices=((30, "30 minutos"), (45, "45 minutos"), (60, "60 minutos")),
+        default=30,
+    )
     motivo = models.CharField("motivo de consulta", max_length=180)
     estado = models.CharField(
         "estado",
@@ -116,7 +124,8 @@ class Cita(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["veterinario", "fecha", "hora"],
-                name="cita_unica_por_veterinario_horario",
+                condition=~models.Q(estado="cancelada"),
+                name="cita_activa_unica_por_veterinario_horario",
             )
         ]
         verbose_name = "cita"
@@ -125,6 +134,38 @@ class Cita(models.Model):
     @property
     def propietario(self) -> Propietario:
         return self.mascota.propietario
+
+    @property
+    def hora_fin(self):
+        inicio = datetime.combine(self.fecha, self.hora)
+        return (inicio + timedelta(minutes=self.duracion_minutos)).time()
+
+    def clean(self):
+        super().clean()
+        if not self.veterinario_id or not self.fecha or not self.hora:
+            return
+        if self.estado == self.Estado.CANCELADA:
+            return
+
+        inicio = datetime.combine(self.fecha, self.hora)
+        fin = inicio + timedelta(minutes=self.duracion_minutos)
+        conflictos = Cita.objects.filter(
+            veterinario=self.veterinario,
+            fecha=self.fecha,
+        ).exclude(estado=self.Estado.CANCELADA)
+        if self.pk:
+            conflictos = conflictos.exclude(pk=self.pk)
+
+        for cita in conflictos:
+            cita_inicio = datetime.combine(cita.fecha, cita.hora)
+            cita_fin = cita_inicio + timedelta(minutes=cita.duracion_minutos)
+            if inicio < cita_fin and fin > cita_inicio:
+                raise ValidationError({
+                    "hora": (
+                        "El horario se solapa con otra cita de este veterinario "
+                        f"({cita.hora:%H:%M}–{cita.hora_fin:%H:%M})."
+                    )
+                })
 
     def __str__(self) -> str:
         return f"{self.fecha} {self.hora:%H:%M} · {self.mascota.nombre}"

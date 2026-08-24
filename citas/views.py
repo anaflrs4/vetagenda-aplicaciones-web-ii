@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .forms import CitaForm, MascotaForm, PropietarioForm, VeterinarioForm
 from .models import Cita, Mascota, Propietario, Veterinario
@@ -28,6 +29,14 @@ def inicio(request):
             "veterinarios": Veterinario.objects.filter(activo=True).count(),
             "citas": Cita.objects.count(),
         },
+        "resumen_estados": [
+            {
+                "valor": valor,
+                "etiqueta": etiqueta,
+                "total": Cita.objects.filter(estado=valor).count(),
+            }
+            for valor, etiqueta in Cita.Estado.choices
+        ],
         "citas_proximas": citas_proximas,
     }
     return render(request, "citas/inicio.html", context)
@@ -267,6 +276,27 @@ def citas(request):
             "q": q,
             "estado": estado,
             "estados": Cita.Estado.choices,
+        },
+    )
+
+
+def agenda_hoy(request):
+    """Agenda acotada al día actual para el personal veterinario."""
+    fecha = timezone.localdate()
+    veterinario_id = request.GET.get("veterinario", "").strip()
+    registros = Cita.objects.select_related(
+        "mascota", "mascota__propietario", "veterinario"
+    ).filter(fecha=fecha)
+    if veterinario_id:
+        registros = registros.filter(veterinario_id=veterinario_id)
+    return render(
+        request,
+        "citas/citas/agenda_hoy.html",
+        {
+            "registros": registros,
+            "fecha": fecha,
+            "veterinario_id": veterinario_id,
+            "veterinarios": Veterinario.objects.filter(activo=True),
         },
     )
 

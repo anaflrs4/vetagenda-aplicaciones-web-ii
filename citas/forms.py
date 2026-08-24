@@ -66,6 +66,7 @@ class CitaForm(FormularioBase):
             "veterinario",
             "fecha",
             "hora",
+            "duracion_minutos",
             "motivo",
             "estado",
             "observaciones",
@@ -80,21 +81,5 @@ class CitaForm(FormularioBase):
         }
 
     def clean(self):
-        cleaned_data = super().clean()
-        veterinario = cleaned_data.get("veterinario")
-        fecha = cleaned_data.get("fecha")
-        hora = cleaned_data.get("hora")
-
-        if veterinario and fecha and hora:
-            coincidencias = Cita.objects.filter(
-                veterinario=veterinario,
-                fecha=fecha,
-                hora=hora,
-            )
-            if self.instance.pk:
-                coincidencias = coincidencias.exclude(pk=self.instance.pk)
-            if coincidencias.exists():
-                raise forms.ValidationError(
-                    "Ese veterinario ya tiene una cita registrada en ese horario."
-                )
-        return cleaned_data
+        # Cita.clean() centraliza la regla para formularios y panel de Django.
+        return super().clean()

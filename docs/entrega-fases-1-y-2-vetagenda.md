@@ -92,7 +92,7 @@ El flujo principal de la aplicación será el siguiente:
 | 4 | Personal veterinario o administrador | Actualiza el estado de la cita. |
 | 5 | Propietario | Consulta la información y el estado de su cita. |
 
-En esta fase se prioriza el flujo administrativo y el funcionamiento básico desde el proyecto Django. La autenticación específica para cada rol, los recordatorios automáticos, el historial clínico completo y otras funciones avanzadas se reservarán para las siguientes clases.
+En esta fase se prioriza el flujo administrativo y el funcionamiento básico desde el proyecto Django. La autenticación específica para cada rol, los recordatorios automáticos, el historial clínico completo y otras funciones avanzadas se reservarán para las siguientes clases. Las reglas detalladas de acceso y transición de estados se encuentran en `docs/reglas-acceso-horarios.md`.
 
 ### 3.3 Modelo conceptual
 
@@ -105,7 +105,7 @@ El modelo de datos inicial estará compuesto por cuatro entidades principales. U
 | Veterinario | Nombre completo, especialidad, teléfono y correo electrónico. |
 | Cita | Mascota, veterinario, fecha, hora, motivo, estado y observaciones. |
 
-Los estados previstos son `solicitada`, `confirmada`, `atendida` y `cancelada`. La validación de cruces de horario y las reglas de acceso se podrán fortalecer en fases posteriores.
+Los estados previstos son `solicitada`, `confirmada`, `atendida` y `cancelada`. El dashboard utiliza un código de colores para distinguirlos: verde azulado para solicitada, amarillo para confirmada, verde para atendida y coral para cancelada. La cancelación libera el horario y no bloquea nuevas citas.
 
 ### 3.4 Diseño técnico
 
@@ -141,7 +141,20 @@ python manage.py makemigrations --check --dry-run
 python manage.py test
 ```
 
-El resultado fue satisfactorio: Django no reportó problemas de configuración, no se detectaron migraciones pendientes y se ejecutaron siete pruebas correctamente. También se verificaron en el navegador el panel principal, el listado de propietarios y el formulario de registro de citas. El detalle de esta revisión se encuentra en `docs/verificacion-fase-2.md`.
+El resultado fue satisfactorio: Django no reportó problemas de configuración, no se detectaron migraciones pendientes y se ejecutaron diez pruebas correctamente. También se verificaron en el navegador el panel principal, el listado de propietarios, el formulario de registro de citas y la agenda diaria. El detalle de esta revisión se encuentra en `docs/verificacion-fase-2.md`.
+
+### 3.7 Retroalimentación docente atendida
+
+La evaluación de la fase 1 recomendó precisar los límites de acceso, acotar la vista del personal veterinario a la agenda del día, evitar solapamientos y planear un dashboard intuitivo con colores por estado. Estas observaciones se incorporaron de la siguiente manera:
+
+| Observación | Decisión de diseño o implementación |
+|---|---|
+| Precisar los límites del Propietario | Puede consultar sus propios registros y solicitar citas; se documenta que puede cancelar solicitudes propias bajo condiciones definidas, pero no eliminar historiales. |
+| Acotar la vista del Personal Veterinario | Se creó `/citas/hoy/`, que muestra solo la fecha actual y permite filtrar por veterinario activo. Cuando exista autenticación, el filtro podrá depender del usuario conectado. |
+| Evitar solapamientos de turnos | Cada cita tiene duración de 30, 45 o 60 minutos. El modelo rechaza intervalos cruzados para el mismo veterinario y la base de datos bloquea duplicados exactos entre citas activas. |
+| Diseñar un dashboard intuitivo | El panel muestra conteos por estado mediante tarjetas con colores diferenciados y utiliza etiquetas cromáticas en las tablas. |
+
+Estas decisiones hacen más precisa la propuesta sin adelantar la autenticación específica por rol, que se reservará para la fase correspondiente. El detalle operativo se encuentra en `docs/reglas-acceso-horarios.md`.
 
 ## 4. Criterios de personalización
 

@@ -30,6 +30,12 @@
     <div class="stat"><span class="stat-value">{{ totales.citas }}</span><span class="stat-label">Citas registradas</span></div>
 </section>
 
+<div class="status-grid" aria-label="Citas por estado">
+    {% for estado in resumen_estados %}
+    <div class="status-card {{ estado.valor }}"><span class="status-total">{{ estado.total }}</span><span class="status-label">{{ estado.etiqueta }}</span></div>
+    {% endfor %}
+</div>
+
 <section class="panel">
     <div class="section-title">
         <div>
