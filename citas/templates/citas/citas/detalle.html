@@ -1,0 +1,31 @@
+{% extends "citas/base.html" %}
+
+{% block title %}Detalle de cita | VetAgenda{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div><div class="eyebrow">Seguimiento</div><h1>Detalle de la cita</h1><p>Consulta toda la información asociada a esta atención.</p></div>
+    <div class="actions"><a class="button secondary" href="{% url 'citas:citas' %}">Volver a la agenda</a><a class="button" href="{% url 'citas:cita_editar' cita.pk %}">Editar cita</a></div>
+</div>
+<div class="split">
+    <section class="panel">
+        <div class="section-title"><h2>{{ cita.mascota.nombre }}</h2><span class="badge {{ cita.estado }}">{{ cita.get_estado_display }}</span></div>
+        <table>
+            <tr><th>Fecha</th><td>{{ cita.fecha|date:"d/m/Y" }}</td></tr>
+            <tr><th>Hora</th><td>{{ cita.hora|time:"H:i" }}</td></tr>
+            <tr><th>Motivo</th><td>{{ cita.motivo }}</td></tr>
+            <tr><th>Veterinario</th><td>{{ cita.veterinario.nombre_completo }}{% if cita.veterinario.especialidad %}<br><span class="muted">{{ cita.veterinario.especialidad }}</span>{% endif %}</td></tr>
+            <tr><th>Observaciones</th><td>{{ cita.observaciones|default:"Sin observaciones registradas." }}</td></tr>
+        </table>
+    </section>
+    <section class="panel">
+        <div class="eyebrow">Ficha relacionada</div>
+        <h2>Paciente</h2>
+        <p><strong>{{ cita.mascota.nombre }}</strong> · {{ cita.mascota.get_especie_display }}</p>
+        <p class="muted">{{ cita.mascota.raza|default:"Raza no registrada" }}</p>
+        <div class="section-title"><h3>Propietario</h3></div>
+        <p>{{ cita.mascota.propietario.nombre_completo }}<br><span class="muted">{{ cita.mascota.propietario.telefono }}</span></p>
+        {% if cita.mascota.propietario.email %}<p class="muted">{{ cita.mascota.propietario.email }}</p>{% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "citas/base.html" %}
+
+{% block title %}Mascotas | VetAgenda{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div><div class="eyebrow">Pacientes</div><h1>Mascotas</h1><p>Consulta y actualiza la ficha básica de cada paciente veterinario.</p></div>
+    <a class="button" href="{% url 'citas:mascota_nueva' %}">+ Nueva mascota</a>
+</div>
+<div class="panel">
+    <form class="searchbar" method="get">
+        <input type="search" name="q" value="{{ q }}" placeholder="Buscar por mascota, especie o propietario" aria-label="Buscar mascotas">
+        <button class="button" type="submit">Buscar</button>
+        {% if q %}<a class="button secondary" href="{% url 'citas:mascotas' %}">Limpiar</a>{% endif %}
+    </form>
+    {% if registros %}
+    <div class="table-wrap"><table>
+        <thead><tr><th>Mascota</th><th>Propietario</th><th>Características</th><th>Citas</th><th>Acciones</th></tr></thead>
+        <tbody>
+            {% for mascota in registros %}
+            <tr>
+                <td><strong>{{ mascota.nombre }}</strong><br><span class="muted">{{ mascota.get_especie_display }}</span></td>
+                <td>{{ mascota.propietario.nombre_completo }}<br><span class="muted">{{ mascota.propietario.telefono }}</span></td>
+                <td>{{ mascota.raza|default:"Sin raza registrada" }}{% if mascota.peso_kg %}<br><span class="muted">{{ mascota.peso_kg }} kg</span>{% endif %}</td>
+                <td>{{ mascota.total_citas }}</td>
+                <td><div class="actions"><a class="button secondary small" href="{% url 'citas:mascota_editar' mascota.pk %}">Editar</a><a class="button danger small" href="{% url 'citas:mascota_eliminar' mascota.pk %}">Eliminar</a></div></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table></div>
+    {% else %}<div class="empty">No hay mascotas registradas{% if q %} que coincidan con tu búsqueda{% endif %}.</div>{% endif %}
+</div>
+{% endblock %}

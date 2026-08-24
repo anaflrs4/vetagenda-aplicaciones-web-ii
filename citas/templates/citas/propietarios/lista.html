@@ -1,0 +1,32 @@
+{% extends "citas/base.html" %}
+
+{% block title %}Propietarios | VetAgenda{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div><div class="eyebrow">Directorio</div><h1>Propietarios</h1><p>Administra los datos de contacto de las personas responsables de las mascotas.</p></div>
+    <a class="button" href="{% url 'citas:propietario_nuevo' %}">+ Nuevo propietario</a>
+</div>
+<div class="panel">
+    <form class="searchbar" method="get">
+        <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, teléfono o correo" aria-label="Buscar propietarios">
+        <button class="button" type="submit">Buscar</button>
+        {% if q %}<a class="button secondary" href="{% url 'citas:propietarios' %}">Limpiar</a>{% endif %}
+    </form>
+    {% if registros %}
+    <div class="table-wrap"><table>
+        <thead><tr><th>Nombre</th><th>Contacto</th><th>Mascotas</th><th>Acciones</th></tr></thead>
+        <tbody>
+            {% for propietario in registros %}
+            <tr>
+                <td><strong>{{ propietario.nombre_completo }}</strong><br><span class="muted">Registro {{ propietario.fecha_registro|date:"d/m/Y" }}</span></td>
+                <td>{{ propietario.telefono }}{% if propietario.email %}<br><span class="muted">{{ propietario.email }}</span>{% endif %}</td>
+                <td>{{ propietario.mascotas.all|length }}</td>
+                <td><div class="actions"><a class="button secondary small" href="{% url 'citas:propietario_editar' propietario.pk %}">Editar</a><a class="button danger small" href="{% url 'citas:propietario_eliminar' propietario.pk %}">Eliminar</a></div></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table></div>
+    {% else %}<div class="empty">No hay propietarios registrados{% if q %} que coincidan con tu búsqueda{% endif %}.</div>{% endif %}
+</div>
+{% endblock %}

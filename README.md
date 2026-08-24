@@ -1,60 +1,76 @@
 # VetAgenda
 
-**VetAgenda** es una propuesta de aplicación web para pequeñas clínicas veterinarias. Su finalidad es organizar la información básica de propietarios, mascotas y citas en un solo lugar, con una estructura que pueda ampliarse durante las siguientes fases de la asignatura Aplicaciones Web II.
+**VetAgenda** es una aplicación web académica para organizar la información de una clínica veterinaria pequeña. Centraliza propietarios, mascotas, veterinarios y citas en un solo lugar, con una estructura preparada para crecer durante las siguientes fases de Aplicaciones Web II.
 
-> Esta entrega corresponde únicamente a la **fase 1: análisis e investigación**. La aplicación contiene un esqueleto inicial y una pantalla de presentación; la autenticación, los permisos, los modelos de base de datos, el historial clínico, las notificaciones y el flujo completo de citas se desarrollarán posteriormente, conforme avancen las clases.
+> Esta entrega integra las **fases 1 y 2**. La fase 1 contiene la investigación, el análisis del problema, los objetivos y el diseño preliminar. La fase 2 incorpora modelos Django, migraciones, formularios, vistas, rutas, plantillas, panel administrativo y operaciones básicas de registro, consulta, edición y eliminación.
 
 ## Problemática
 
-En una clínica veterinaria pequeña, el uso de registros manuales o dispersos puede dificultar la localización y actualización de la información de propietarios, mascotas y consultas. La literatura revisada relaciona esta situación con pérdida o duplicidad de información, búsquedas lentas y procesos administrativos poco eficientes [1]. Asimismo, una propuesta académica de gestión veterinaria identifica la necesidad de registrar los datos de cada paciente y programar las próximas citas para obtener información más confiable [2].
+En una clínica veterinaria pequeña, los datos de propietarios, mascotas y consultas pueden estar dispersos entre libretas, mensajes y archivos independientes. Esto dificulta localizar información, organizar horarios y conocer el estado de cada cita. La literatura revisada relaciona la gestión manual con problemas de organización, pérdida o duplicidad de información y procesos administrativos poco eficientes [1]. Un trabajo académico sobre una clínica veterinaria también identifica la utilidad de registrar los datos de cada paciente y programar sus próximas citas [2].
 
-A partir de esta problemática se plantean tres necesidades: centralizar los registros, ordenar la agenda del personal veterinario y mejorar la comunicación del estado de cada cita con la persona propietaria de la mascota.
+VetAgenda responde a tres necesidades: centralizar los registros, ordenar la agenda del personal veterinario y mejorar el seguimiento del estado de cada cita.
 
 ## Objetivo general
 
-Diseñar una aplicación web que permita organizar la información básica de propietarios, mascotas y citas veterinarias, con una arquitectura preparada para mejorar el control administrativo y el seguimiento de las consultas.
-
-## Objetivos específicos
-
-| Objetivo | Propósito |
-|---|---|
-| Analizar la problemática de la gestión manual o dispersa | Identificar las necesidades que justifican la aplicación. |
-| Definir los usuarios y roles principales | Separar las responsabilidades del propietario, el personal veterinario y la administración. |
-| Diseñar la estructura inicial del proyecto | Preparar la base técnica para incorporar funcionalidades en las siguientes fases. |
-| Proponer una solución reutilizable | Permitir que la lógica pueda adaptarse a clínicas veterinarias pequeñas con necesidades semejantes. |
+Diseñar y desarrollar progresivamente una aplicación web que centralice la información básica de propietarios, mascotas y citas veterinarias para mejorar la organización administrativa y el seguimiento de consultas.
 
 ## Roles preliminares
 
 | Rol | Responsabilidad prevista |
 |---|---|
-| Propietario de mascota | Solicitar o consultar una cita y revisar la información básica de su mascota. |
-| Personal veterinario | Consultar la agenda y actualizar el estado de las citas durante la atención. |
-| Administrador | Gestionar la información general, los usuarios y la configuración de la clínica. |
+| Propietario de mascota | Consultar sus mascotas y solicitar o revisar una cita. |
+| Personal veterinario | Consultar la agenda y actualizar el estado de la atención. |
+| Administrador | Gestionar propietarios, mascotas, veterinarios, citas y configuración general. |
 
-Estos roles son parte del diseño preliminar. En esta fase todavía no se implementan permisos ni autenticación.
+La separación completa de permisos por rol se continuará en fases posteriores. En esta fase, el panel administrativo de Django permite gestionar los registros con una cuenta de superusuario.
 
-## Tecnologías previstas
+## Funcionalidades de la fase 2
 
-El esqueleto se basa en **Django** y **Django REST Framework**, siguiendo la demostración de clase. La estructura separa el proyecto `vetagenda` de la aplicación `citas`. La pantalla inicial está implementada con una vista y una plantilla HTML para presentar la problemática y los roles, pero aún no se han definido los modelos ni los endpoints de la API.
+| Módulo | Funcionalidades implementadas |
+|---|---|
+| Panel | Resumen de registros, próximas citas y navegación principal. |
+| Propietarios | Listar, buscar, registrar, editar y eliminar propietarios. |
+| Mascotas | Listar, buscar, registrar, editar y eliminar mascotas relacionadas con un propietario. |
+| Veterinarios | Listar, buscar, registrar, editar y eliminar personal veterinario. |
+| Citas | Listar, buscar, filtrar por estado, registrar, ver detalle, editar y eliminar citas. |
+| Validación | Evitar que un veterinario tenga dos citas en la misma fecha y hora. |
+| Administración | Gestionar las cuatro entidades desde `/admin/` mediante el panel de Django. |
+
+Los datos incluidos con el comando de demostración son ficticios. No se utilizan pacientes ni propietarios reales.
+
+## Tecnologías
+
+El proyecto utiliza **Python**, **Django 5.2** y **Django REST Framework**. La fase actual utiliza las vistas y formularios de Django para demostrar el flujo web y deja preparado el proyecto para incorporar serializers y endpoints de API cuando sean solicitados en clases posteriores. La base de datos local de desarrollo utiliza SQLite.
 
 ## Estructura principal
 
 ```text
 vetagenda/
 ├── citas/
-│   ├── migrations/
-│   ├── templates/citas/inicio.html
+│   ├── management/commands/cargar_demo.py
+│   ├── migrations/0001_initial.py
+│   ├── templates/citas/
+│   │   ├── base.html
+│   │   ├── inicio.html
+│   │   ├── formulario.html
+│   │   ├── propietarios/lista.html
+│   │   ├── mascotas/lista.html
+│   │   ├── veterinarios/lista.html
+│   │   └── citas/{lista,detalle}.html
 │   ├── admin.py
-│   ├── apps.py
+│   ├── forms.py
 │   ├── models.py
 │   ├── tests.py
 │   ├── urls.py
 │   └── views.py
 ├── docs/
+│   ├── entrega-fases-1-y-2-vetagenda.md
+│   ├── fase-1-analisis-vetagenda.md
+│   └── verificacion-fase-2.md
 ├── vetagenda/
-│   ├── asgi.py
 │   ├── settings.py
 │   ├── urls.py
+│   ├── asgi.py
 │   └── wsgi.py
 ├── .gitignore
 ├── manage.py
@@ -64,12 +80,14 @@ vetagenda/
 
 ## Instalación local
 
-Se recomienda utilizar Python 3.11 o una versión compatible. Desde la carpeta del proyecto se puede crear un entorno virtual, instalar las dependencias y ejecutar el servidor de desarrollo:
+Se recomienda utilizar Python 3.11 o una versión compatible. Desde la carpeta del proyecto, crea un entorno virtual, instala las dependencias, aplica las migraciones y ejecuta el servidor:
 
 ```bash
 python -m venv .venv
+
 # Windows:
 .venv\Scripts\activate
+
 # macOS/Linux:
 source .venv/bin/activate
 
@@ -78,18 +96,45 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Después se puede abrir `http://127.0.0.1:8000/` en el navegador. La pantalla inicial muestra la propuesta de VetAgenda y el alcance de esta primera fase.
+Abre `http://127.0.0.1:8000/` para ver el panel de VetAgenda.
 
-## Próximas fases
+### Datos ficticios para la demostración
 
-Las siguientes fases podrán incorporar el diseño de modelos para propietarios, mascotas, veterinarios y citas; autenticación y permisos por rol; operaciones de creación, consulta, actualización y cancelación; historial de citas; serializadores y endpoints de Django REST Framework; y una interfaz más completa. Esas funcionalidades no forman parte de esta entrega inicial.
+Para cargar propietarios, mascotas, veterinarios y citas de ejemplo, ejecuta:
+
+```bash
+python manage.py cargar_demo
+```
+
+El comando se puede ejecutar nuevamente sin duplicar los datos principales. Para entrar al panel administrativo, crea una cuenta local:
+
+```bash
+python manage.py createsuperuser
+```
+
+Después abre `http://127.0.0.1:8000/admin/` e inicia sesión con las credenciales que hayas creado localmente. No se incluyen contraseñas en el repositorio.
+
+## Pruebas
+
+El proyecto incluye pruebas para la pantalla inicial, las relaciones del modelo, la validación de horarios duplicados, el registro de citas, el filtro por estado y el listado de mascotas. Para ejecutarlas:
+
+```bash
+python manage.py check
+python manage.py test
+```
+
+## Alcance y siguientes fases
+
+Esta entrega no incluye pagos, notificaciones automáticas, despliegue en producción, aplicación móvil, historial clínico completo, autenticación específica por rol ni una API REST completa. Estas funciones se reservarán para las siguientes fases, conforme a las instrucciones de la asignatura.
 
 ## Referencias
 
-[1]: https://journals.gdeon.org/index.php/esj/article/view/174 "Use of Web applications for the management of veterinary clinics and their impact on the improvement of administrative processes, Ecuadorian Science Journal"
+[1]: https://journals.gdeon.org/index.php/esj/article/view/174 "Cedeño Ochoa, A., Catuto Murillo, A. y Rodas-Silva, J. (2021). Use of Web applications for the management of veterinary clinics and their impact on the improvement of administrative processes. Ecuadorian Science Journal."
 
-[2]: https://dspace.ups.edu.ec/handle/123456789/16991 "Desarrollo de aplicación web para la gestión de consultas y agendamiento de citas de mascota de la clínica veterinaria Burgos, Universidad Politécnica Salesiana"
+[2]: https://dspace.ups.edu.ec/handle/123456789/16991 "Loor García, Y. Y. (2019). Desarrollo de aplicación web para la gestión de consultas y agendamiento de citas de mascota de la clínica veterinaria Burgos. Universidad Politécnica Salesiana."
 
-[3]: https://us06web.zoom.us/rec/play/xpiXtG2Xdm4Ku5-ToG4Rh8QetL8BoMohqkWoMQRURsJE5hoI8f1Ht_608IUFwEarfTXDvYsOvjpQcirB.ruayaNEWNs3A0R5Q "Grabación de la clase del 11 de agosto de 2026"
+[3]: https://us06web.zoom.us/rec/play/3OM_gagL-hd7ZycEfLdbi2o98mwmreaD3cb_yFfBWkunpB14g-X4lSbUw_PDhv4nRH54ngX2DqvzsNf8.M6h_csFp3j2SbgcD "Grabación de Aplicaciones Web II del 18 de agosto de 2026."
 
-[4]: https://us06web.zoom.us/rec/play/8BGovfR-hpcbB7A9sY9mEgYpnzU4yHD8rGM3VHFz54RutEcv12NrWcJgomomiSNk5HLJgGEStE3cNGst.Mld7TUn6EByrjm73 "Grabación de la clase del 13 de agosto de 2026"
+[4]: https://us06web.zoom.us/rec/play/iKp5n7O_5voheVRrxfJtCvflme7mhAYgQG97BvdgBn_uSK8KGR2Du5IjH6rL7EzbfSpKVlhbAuW15ELP.jlYE_ZpxAzER5lmZ "Grabación de Aplicaciones Web II del 20 de agosto de 2026."
+
+[5]: https://github.com/anaflrs4/vetagenda-aplicaciones-web-ii "Repositorio público de VetAgenda."

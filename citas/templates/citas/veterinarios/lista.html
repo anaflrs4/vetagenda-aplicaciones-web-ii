@@ -1,0 +1,34 @@
+{% extends "citas/base.html" %}
+
+{% block title %}Veterinarios | VetAgenda{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div><div class="eyebrow">Equipo clínico</div><h1>Veterinarios</h1><p>Administra el personal que atenderá las consultas de la clínica.</p></div>
+    <a class="button" href="{% url 'citas:veterinario_nuevo' %}">+ Nuevo veterinario</a>
+</div>
+<div class="panel">
+    <form class="searchbar" method="get">
+        <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, especialidad o correo" aria-label="Buscar veterinarios">
+        <button class="button" type="submit">Buscar</button>
+        {% if q %}<a class="button secondary" href="{% url 'citas:veterinarios' %}">Limpiar</a>{% endif %}
+    </form>
+    {% if registros %}
+    <div class="table-wrap"><table>
+        <thead><tr><th>Nombre</th><th>Especialidad</th><th>Contacto</th><th>Estado</th><th>Consultas</th><th>Acciones</th></tr></thead>
+        <tbody>
+            {% for veterinario in registros %}
+            <tr>
+                <td><strong>{{ veterinario.nombre_completo }}</strong></td>
+                <td>{{ veterinario.especialidad|default:"General" }}</td>
+                <td>{{ veterinario.telefono|default:"Sin teléfono" }}{% if veterinario.email %}<br><span class="muted">{{ veterinario.email }}</span>{% endif %}</td>
+                <td>{% if veterinario.activo %}<span class="badge">Activo</span>{% else %}<span class="badge cancelada">Inactivo</span>{% endif %}</td>
+                <td>{{ veterinario.total_citas }}</td>
+                <td><div class="actions"><a class="button secondary small" href="{% url 'citas:veterinario_editar' veterinario.pk %}">Editar</a><a class="button danger small" href="{% url 'citas:veterinario_eliminar' veterinario.pk %}">Eliminar</a></div></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table></div>
+    {% else %}<div class="empty">No hay veterinarios registrados{% if q %} que coincidan con tu búsqueda{% endif %}.</div>{% endif %}
+</div>
+{% endblock %}

@@ -1,8 +1,8 @@
 """Django settings for the VetAgenda project.
 
-This first-phase scaffold intentionally keeps the business logic minimal.
-Authentication, permissions, persistence and API endpoints will be added in
-later class phases.
+The project currently contains the phase-one analysis and the phase-two
+modeling, forms, views and basic database operations. Role-specific
+authentication and the complete API are reserved for later phases.
 """
 from pathlib import Path
 
