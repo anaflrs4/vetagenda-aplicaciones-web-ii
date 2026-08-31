@@ -1,5 +1,8 @@
 from datetime import date, time, timedelta
+from io import StringIO
 
+from django.contrib.auth.models import Group
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -166,6 +169,15 @@ class FlujoVetAgendaTests(VetAgendaDatosMixin, TestCase):
         response = self.client.get(reverse("citas:agenda_hoy"))
         self.assertContains(response, "Cita de hoy")
         self.assertNotContains(response, "Cita futura")
+
+    def test_configurar_roles_crea_grupos_y_permisos(self):
+        call_command("configurar_roles", stdout=StringIO())
+        propietario = Group.objects.get(name="Propietario")
+        personal = Group.objects.get(name="Personal veterinario")
+        administrador = Group.objects.get(name="Administrador")
+        self.assertEqual(propietario.permissions.count(), 7)
+        self.assertEqual(personal.permissions.count(), 5)
+        self.assertEqual(administrador.permissions.count(), 16)
 
     def test_el_dashboard_muestra_el_resumen_por_estado(self):
         Cita.objects.create(

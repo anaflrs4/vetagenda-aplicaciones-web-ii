@@ -1,0 +1,104 @@
+[
+  {
+    "model": "citas.propietario",
+    "pk": 1,
+    "fields": {
+      "nombre_completo": "Ana López",
+      "telefono": "555 100 2000",
+      "email": "ana.demo@vetagenda.local",
+      "fecha_registro": "2026-09-10T09:00:00Z"
+    }
+  },
+  {
+    "model": "citas.propietario",
+    "pk": 2,
+    "fields": {
+      "nombre_completo": "Mario Hernández",
+      "telefono": "555 300 4000",
+      "email": "mario.demo@vetagenda.local",
+      "fecha_registro": "2026-09-10T09:05:00Z"
+    }
+  },
+  {
+    "model": "citas.mascota",
+    "pk": 1,
+    "fields": {
+      "propietario": 1,
+      "nombre": "Luna",
+      "especie": "gato",
+      "raza": "Europeo común",
+      "fecha_nacimiento": "2022-04-12",
+      "peso_kg": "4.20",
+      "notas": "Revisión de alimentación.",
+      "fecha_registro": "2026-09-10T09:10:00Z"
+    }
+  },
+  {
+    "model": "citas.mascota",
+    "pk": 2,
+    "fields": {
+      "propietario": 2,
+      "nombre": "Max",
+      "especie": "perro",
+      "raza": "Mestizo",
+      "fecha_nacimiento": "2020-09-01",
+      "peso_kg": "18.50",
+      "notas": "Confirmar esquema de vacunación.",
+      "fecha_registro": "2026-09-10T09:15:00Z"
+    }
+  },
+  {
+    "model": "citas.veterinario",
+    "pk": 1,
+    "fields": {
+      "nombre_completo": "Dra. Sofía Torres",
+      "especialidad": "Medicina felina",
+      "telefono": "555 500 6000",
+      "email": "sofia.demo@vetagenda.local",
+      "activo": true
+    }
+  },
+  {
+    "model": "citas.veterinario",
+    "pk": 2,
+    "fields": {
+      "nombre_completo": "Dr. Diego Ramírez",
+      "especialidad": "Medicina preventiva",
+      "telefono": "555 700 8000",
+      "email": "diego.demo@vetagenda.local",
+      "activo": true
+    }
+  },
+  {
+    "model": "citas.cita",
+    "pk": 1,
+    "fields": {
+      "mascota": 1,
+      "veterinario": 1,
+      "fecha": "2026-09-10",
+      "hora": "10:30:00",
+      "duracion_minutos": 30,
+      "motivo": "Revisión general",
+      "estado": "confirmada",
+      "observaciones": "Revisar alimentación y peso.",
+      "creado_en": "2026-09-10T09:20:00Z",
+      "actualizado_en": "2026-09-10T09:20:00Z"
+    }
+  },
+  {
+    "model": "citas.cita",
+    "pk": 2,
+    "fields": {
+      "mascota": 2,
+      "veterinario": 2,
+      "fecha": "2026-09-11",
+      "hora": "12:00:00",
+      "duracion_minutos": 45,
+      "motivo": "Vacunación anual",
+      "estado": "solicitada",
+      "observaciones": "Confirmar esquema de vacunación.",
+      "creado_en": "2026-09-10T09:25:00Z",
+      "actualizado_en": "2026-09-10T09:25:00Z"
+    }
+  }
+]

@@ -2,7 +2,7 @@
 
 **VetAgenda** es una aplicación web académica para organizar la información de una clínica veterinaria pequeña. Centraliza propietarios, mascotas, veterinarios y citas en un solo lugar, con una estructura preparada para crecer durante las siguientes fases de Aplicaciones Web II.
 
-> Esta entrega integra las **fases 1 y 2**. La fase 1 contiene la investigación, el análisis del problema, los objetivos y el diseño preliminar. La fase 2 incorpora modelos Django, migraciones, formularios, vistas, rutas, plantillas, panel administrativo y operaciones básicas de registro, consulta, edición y eliminación.
+> Esta entrega integra las **fases 1, 2 y 3**. La fase 1 contiene la investigación, el análisis del problema, los objetivos y el diseño preliminar. La fase 2 incorpora modelos Django, migraciones, formularios, vistas, rutas, plantillas, panel administrativo y operaciones básicas. La fase 3 documenta el modelo físico, la conexión con el backend, los roles y permisos, la recreación de datos y las pruebas de humo.
 
 ## Problemática
 
@@ -22,7 +22,7 @@ Diseñar y desarrollar progresivamente una aplicación web que centralice la inf
 | Personal veterinario | Consultar la agenda y actualizar el estado de la atención. |
 | Administrador | Gestionar propietarios, mascotas, veterinarios, citas y configuración general. |
 
-La separación completa de permisos por rol se continuará en fases posteriores. En esta fase, el panel administrativo de Django permite gestionar los registros con una cuenta de superusuario.
+Los grupos y permisos base se pueden crear con `python manage.py configurar_roles`. La autenticación específica por usuario y el filtrado automático de cada vista se continuarán en fases posteriores. El panel administrativo de Django permite gestionar los registros con una cuenta de superusuario.
 
 ## Funcionalidades de la fase 2
 
@@ -51,8 +51,9 @@ El proyecto utiliza **Python**, **Django 5.2** y **Django REST Framework**. La f
 ```text
 vetagenda/
 ├── citas/
-│   ├── management/commands/cargar_demo.py
-│   ├── migrations/0001_initial.py
+│   ├── fixtures/vetagenda_demo.json
+│   ├── management/commands/{cargar_demo,configurar_roles}.py
+│   ├── migrations/{0001_initial,0002_cita_duracion_minutos,0003_...}.py
 │   ├── templates/citas/
 │   │   ├── base.html
 │   │   ├── inicio.html
@@ -68,10 +69,12 @@ vetagenda/
 │   ├── urls.py
 │   └── views.py
 ├── docs/
+│   ├── entrega-fase-3-vetagenda.md
 │   ├── entrega-fases-1-y-2-vetagenda.md
 │   ├── fase-1-analisis-vetagenda.md
 │   ├── reglas-acceso-horarios.md
-│   ├── guion-video-fase-2.md
+│   ├── pruebas-humo-fase-3.md
+│   ├── sql-schema-citas.sql
 │   └── verificacion-fase-2.md
 ├── vetagenda/
 │   ├── settings.py
@@ -104,7 +107,7 @@ python manage.py runserver
 
 Abre `http://127.0.0.1:8000/` para ver el panel de VetAgenda. La agenda diaria se encuentra en `http://127.0.0.1:8000/citas/hoy/`.
 
-### Datos ficticios para la demostración
+### Datos ficticios y roles para la demostración
 
 Para cargar propietarios, mascotas, veterinarios y citas de ejemplo, ejecuta:
 
@@ -112,7 +115,7 @@ Para cargar propietarios, mascotas, veterinarios y citas de ejemplo, ejecuta:
 python manage.py cargar_demo
 ```
 
-El comando se puede ejecutar nuevamente sin duplicar los datos principales. Para entrar al panel administrativo, crea una cuenta local:
+El comando se puede ejecutar nuevamente sin duplicar los datos principales. También se puede cargar el arreglo de objetos JSON incluido en `citas/fixtures/vetagenda_demo.json` mediante `python manage.py loaddata citas/fixtures/vetagenda_demo.json`. Para configurar los grupos y permisos definidos en la fase 3, ejecuta `python manage.py configurar_roles`. Para entrar al panel administrativo, crea una cuenta local:
 
 ```bash
 python manage.py createsuperuser
@@ -122,7 +125,7 @@ Después abre `http://127.0.0.1:8000/admin/` e inicia sesión con las credencial
 
 ## Pruebas
 
-El proyecto incluye diez pruebas para la pantalla inicial, las relaciones del modelo, la validación de horarios duplicados y solapados, el registro de citas, el filtro por estado, el listado de mascotas, la agenda diaria y el resumen del dashboard. Para ejecutarlas:
+El proyecto incluye once pruebas para la pantalla inicial, las relaciones del modelo, la validación de horarios duplicados y solapados, el registro de citas, el filtro por estado, el listado de mascotas, la agenda diaria, el resumen del dashboard y la creación de grupos y permisos. La bitácora de pruebas de humo de fase 3 se encuentra en `docs/pruebas-humo-fase-3.md`. Para ejecutarlas:
 
 ```bash
 python manage.py check
