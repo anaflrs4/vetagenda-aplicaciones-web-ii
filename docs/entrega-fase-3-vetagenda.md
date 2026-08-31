@@ -127,6 +127,16 @@ Resultado obtenido:
 | Agenda diaria | Verificada con la fecha actual y filtro por veterinario. |
 | Reglas de horario | Verificadas mediante pruebas de duplicado y solapamiento parcial. |
 
+### Evidencia visual
+
+El dashboard muestra el resumen general y las tarjetas codificadas por color para cada estado de cita:
+
+![Dashboard de VetAgenda](assets/dashboard-fase-3.webp)
+
+La agenda del personal veterinario limita la consulta a las citas del día actual y permite filtrar por profesional activo:
+
+![Agenda de hoy de VetAgenda](assets/agenda-hoy-fase-3.webp)
+
 ## 8. Alcance y limitaciones
 
 La fase 3 integra el modelo físico y el backend del proyecto. Todavía no incluye autenticación específica por usuario, recuperación de contraseña, API REST completa, notificaciones, pagos, historial clínico integral ni despliegue en producción. Estas funciones se desarrollarán únicamente cuando sean solicitadas en las fases correspondientes.

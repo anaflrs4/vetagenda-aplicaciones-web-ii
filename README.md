@@ -69,6 +69,7 @@ vetagenda/
 │   ├── urls.py
 │   └── views.py
 ├── docs/
+│   ├── assets/{dashboard-fase-3,agenda-hoy-fase-3}.webp
 │   ├── entrega-fase-3-vetagenda.md
 │   ├── entrega-fases-1-y-2-vetagenda.md
 │   ├── fase-1-analisis-vetagenda.md
