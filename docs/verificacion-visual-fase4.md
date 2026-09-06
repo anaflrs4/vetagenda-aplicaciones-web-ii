@@ -17,3 +17,7 @@ También se verificaron en el navegador las siguientes evidencias:
 Las capturas se encuentran en `docs/assets/fase4/` y los resultados automatizados en `docs/resultados-pruebas-fase4.txt`.
 
 Las páginas 18 y 19 del DOCX también fueron revisadas. La captura del endpoint REST es legible; la tabla resume correctamente las **18 pruebas aprobadas**; y las rutas de evidencia, los comandos de reproducción, la conclusión y las cuatro fuentes específicas de la fase 4 aparecen completas. No se observaron elementos cortados fuera de la página.
+
+Se revisó la versión corregida `ProyectoFases1a4_VetAgenda_COMPLETO.docx`. La fase 4 ahora aparece de forma explícita y completa con los apartados: resumen ejecutivo, retroalimentación docente atendida, objetivo y alcance, arquitectura implementada, comparación antes y después, diseño de la capa DAO, reglas de transición, endpoint REST, pruebas de humo e integración, evidencias visuales, procedimiento de reproducción, resultado de la fase, ubicación en el repositorio y referencias. Las páginas 14 a 18 muestran correctamente las tablas, el diagrama y las primeras capturas de evidencia.
+
+Las páginas 19 a 21 de la versión corregida también fueron verificadas. Incluyen la captura posterior al cambio de estado, la captura del endpoint REST, el procedimiento completo de reproducción, el resultado de la fase, la tabla de ubicación de evidencias, el enlace público del repositorio y las cuatro referencias. No se observaron recortes ni omisiones. El documento final tiene 21 páginas.
