@@ -1,17 +1,22 @@
 from django.contrib import messages
-from django.db.models import Count, Q
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
+from django.core.exceptions import ValidationError
+from django.http import Http404
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 
+from .dao import CitaDAO, MascotaDAO, PropietarioDAO, VeterinarioDAO
 from .forms import CitaForm, MascotaForm, PropietarioForm, VeterinarioForm
-from .models import Cita, Mascota, Propietario, Veterinario
+from .models import Cita
+
+
+def _requerir(registro, mensaje="El registro solicitado no existe."):
+    if registro is None:
+        raise Http404(mensaje)
+    return registro
 
 
 def inicio(request):
-    """Dashboard principal for the phase-two functional advance."""
-    citas_proximas = Cita.objects.select_related(
-        "mascota", "mascota__propietario", "veterinario"
-    )[:5]
+    """Dashboard principal conectado a la capa DAO."""
     context = {
         "nombre_app": "VetAgenda",
         "descripcion": (
@@ -24,44 +29,30 @@ def inicio(request):
             "Administrador",
         ],
         "totales": {
-            "propietarios": Propietario.objects.count(),
-            "mascotas": Mascota.objects.count(),
-            "veterinarios": Veterinario.objects.filter(activo=True).count(),
-            "citas": Cita.objects.count(),
+            "propietarios": PropietarioDAO.contar(),
+            "mascotas": MascotaDAO.contar(),
+            "veterinarios": VeterinarioDAO.contar_activos(),
+            "citas": CitaDAO.contar(),
         },
-        "resumen_estados": [
-            {
-                "valor": valor,
-                "etiqueta": etiqueta,
-                "total": Cita.objects.filter(estado=valor).count(),
-            }
-            for valor, etiqueta in Cita.Estado.choices
-        ],
-        "citas_proximas": citas_proximas,
+        "resumen_estados": CitaDAO.resumen_estados(),
+        "citas_proximas": CitaDAO.listar_proximas(),
     }
     return render(request, "citas/inicio.html", context)
 
 
 def propietarios(request):
     q = request.GET.get("q", "").strip()
-    registros = Propietario.objects.prefetch_related("mascotas")
-    if q:
-        registros = registros.filter(
-            Q(nombre_completo__icontains=q)
-            | Q(telefono__icontains=q)
-            | Q(email__icontains=q)
-        )
     return render(
         request,
         "citas/propietarios/lista.html",
-        {"registros": registros, "q": q},
+        {"registros": PropietarioDAO.listar(q), "q": q},
     )
 
 
 def propietario_nuevo(request):
     form = PropietarioForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        propietario = form.save()
+        propietario = PropietarioDAO.guardar(form.save(commit=False))
         messages.success(request, f"Se registró a {propietario.nombre_completo}.")
         return redirect("citas:propietarios")
     return render(
@@ -77,10 +68,10 @@ def propietario_nuevo(request):
 
 
 def propietario_editar(request, pk):
-    registro = get_object_or_404(Propietario, pk=pk)
+    registro = _requerir(PropietarioDAO.obtener_por_id(pk))
     form = PropietarioForm(request.POST or None, instance=registro)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        PropietarioDAO.guardar(form.save(commit=False))
         messages.success(request, "Los datos del propietario se actualizaron.")
         return redirect("citas:propietarios")
     return render(
@@ -96,10 +87,10 @@ def propietario_editar(request, pk):
 
 
 def propietario_eliminar(request, pk):
-    registro = get_object_or_404(Propietario, pk=pk)
+    registro = _requerir(PropietarioDAO.obtener_por_id(pk))
     if request.method == "POST":
         nombre = registro.nombre_completo
-        registro.delete()
+        PropietarioDAO.eliminar(registro)
         messages.success(request, f"Se eliminó el registro de {nombre}.")
         return redirect("citas:propietarios")
     return render(
@@ -115,26 +106,17 @@ def propietario_eliminar(request, pk):
 
 def mascotas(request):
     q = request.GET.get("q", "").strip()
-    registros = Mascota.objects.select_related("propietario").annotate(
-        total_citas=Count("citas")
-    )
-    if q:
-        registros = registros.filter(
-            Q(nombre__icontains=q)
-            | Q(propietario__nombre_completo__icontains=q)
-            | Q(especie__icontains=q)
-        )
     return render(
         request,
         "citas/mascotas/lista.html",
-        {"registros": registros, "q": q},
+        {"registros": MascotaDAO.listar(q), "q": q},
     )
 
 
 def mascota_nueva(request):
     form = MascotaForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        mascota = form.save()
+        mascota = MascotaDAO.guardar(form.save(commit=False))
         messages.success(request, f"Se registró a {mascota.nombre}.")
         return redirect("citas:mascotas")
     return render(
@@ -150,10 +132,10 @@ def mascota_nueva(request):
 
 
 def mascota_editar(request, pk):
-    registro = get_object_or_404(Mascota, pk=pk)
+    registro = _requerir(MascotaDAO.obtener_por_id(pk))
     form = MascotaForm(request.POST or None, instance=registro)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        MascotaDAO.guardar(form.save(commit=False))
         messages.success(request, "Los datos de la mascota se actualizaron.")
         return redirect("citas:mascotas")
     return render(
@@ -169,10 +151,10 @@ def mascota_editar(request, pk):
 
 
 def mascota_eliminar(request, pk):
-    registro = get_object_or_404(Mascota, pk=pk)
+    registro = _requerir(MascotaDAO.obtener_por_id(pk))
     if request.method == "POST":
         nombre = registro.nombre
-        registro.delete()
+        MascotaDAO.eliminar(registro)
         messages.success(request, f"Se eliminó la mascota {nombre}.")
         return redirect("citas:mascotas")
     return render(
@@ -184,24 +166,17 @@ def mascota_eliminar(request, pk):
 
 def veterinarios(request):
     q = request.GET.get("q", "").strip()
-    registros = Veterinario.objects.annotate(total_citas=Count("citas"))
-    if q:
-        registros = registros.filter(
-            Q(nombre_completo__icontains=q)
-            | Q(especialidad__icontains=q)
-            | Q(email__icontains=q)
-        )
     return render(
         request,
         "citas/veterinarios/lista.html",
-        {"registros": registros, "q": q},
+        {"registros": VeterinarioDAO.listar(q), "q": q},
     )
 
 
 def veterinario_nuevo(request):
     form = VeterinarioForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        veterinario = form.save()
+        veterinario = VeterinarioDAO.guardar(form.save(commit=False))
         messages.success(request, f"Se registró a {veterinario.nombre_completo}.")
         return redirect("citas:veterinarios")
     return render(
@@ -217,10 +192,10 @@ def veterinario_nuevo(request):
 
 
 def veterinario_editar(request, pk):
-    registro = get_object_or_404(Veterinario, pk=pk)
+    registro = _requerir(VeterinarioDAO.obtener_por_id(pk))
     form = VeterinarioForm(request.POST or None, instance=registro)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        VeterinarioDAO.guardar(form.save(commit=False))
         messages.success(request, "Los datos del veterinario se actualizaron.")
         return redirect("citas:veterinarios")
     return render(
@@ -236,10 +211,10 @@ def veterinario_editar(request, pk):
 
 
 def veterinario_eliminar(request, pk):
-    registro = get_object_or_404(Veterinario, pk=pk)
+    registro = _requerir(VeterinarioDAO.obtener_por_id(pk))
     if request.method == "POST":
         nombre = registro.nombre_completo
-        registro.delete()
+        VeterinarioDAO.eliminar(registro)
         messages.success(request, f"Se eliminó el registro de {nombre}.")
         return redirect("citas:veterinarios")
     return render(
@@ -256,23 +231,11 @@ def veterinario_eliminar(request, pk):
 def citas(request):
     q = request.GET.get("q", "").strip()
     estado = request.GET.get("estado", "").strip()
-    registros = Cita.objects.select_related(
-        "mascota", "mascota__propietario", "veterinario"
-    )
-    if q:
-        registros = registros.filter(
-            Q(mascota__nombre__icontains=q)
-            | Q(mascota__propietario__nombre_completo__icontains=q)
-            | Q(motivo__icontains=q)
-            | Q(veterinario__nombre_completo__icontains=q)
-        )
-    if estado:
-        registros = registros.filter(estado=estado)
     return render(
         request,
         "citas/citas/lista.html",
         {
-            "registros": registros,
+            "registros": CitaDAO.listar(q, estado),
             "q": q,
             "estado": estado,
             "estados": Cita.Estado.choices,
@@ -281,22 +244,16 @@ def citas(request):
 
 
 def agenda_hoy(request):
-    """Agenda acotada al día actual para el personal veterinario."""
-    fecha = timezone.localdate()
+    """Agenda del día obtenida exclusivamente mediante el DAO."""
     veterinario_id = request.GET.get("veterinario", "").strip()
-    registros = Cita.objects.select_related(
-        "mascota", "mascota__propietario", "veterinario"
-    ).filter(fecha=fecha)
-    if veterinario_id:
-        registros = registros.filter(veterinario_id=veterinario_id)
     return render(
         request,
         "citas/citas/agenda_hoy.html",
         {
-            "registros": registros,
-            "fecha": fecha,
+            "registros": CitaDAO.listar_hoy(veterinario_id),
+            "fecha": CitaDAO.fecha_actual(),
             "veterinario_id": veterinario_id,
-            "veterinarios": Veterinario.objects.filter(activo=True),
+            "veterinarios": VeterinarioDAO.listar_activos(),
         },
     )
 
@@ -304,7 +261,7 @@ def agenda_hoy(request):
 def cita_nueva(request):
     form = CitaForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        cita = form.save()
+        cita = CitaDAO.guardar(form.save(commit=False))
         messages.success(request, f"La cita de {cita.mascota.nombre} se registró correctamente.")
         return redirect("citas:citas")
     return render(
@@ -320,10 +277,10 @@ def cita_nueva(request):
 
 
 def cita_editar(request, pk):
-    registro = get_object_or_404(Cita, pk=pk)
+    registro = _requerir(CitaDAO.obtener_por_id(pk))
     form = CitaForm(request.POST or None, instance=registro)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        CitaDAO.guardar(form.save(commit=False))
         messages.success(request, "La cita se actualizó correctamente.")
         return redirect("citas:citas")
     return render(
@@ -339,17 +296,14 @@ def cita_editar(request, pk):
 
 
 def cita_detalle(request, pk):
-    registro = get_object_or_404(
-        Cita.objects.select_related("mascota", "mascota__propietario", "veterinario"),
-        pk=pk,
-    )
+    registro = _requerir(CitaDAO.obtener_por_id(pk), "La cita solicitada no existe.")
     return render(request, "citas/citas/detalle.html", {"cita": registro})
 
 
 def cita_eliminar(request, pk):
-    registro = get_object_or_404(Cita, pk=pk)
+    registro = _requerir(CitaDAO.obtener_por_id(pk), "La cita solicitada no existe.")
     if request.method == "POST":
-        registro.delete()
+        CitaDAO.eliminar(registro)
         messages.success(request, "La cita se eliminó correctamente.")
         return redirect("citas:citas")
     return render(
@@ -357,3 +311,19 @@ def cita_eliminar(request, pk):
         "citas/confirmar_eliminacion.html",
         {"registro": registro, "tipo": "cita", "volver": "citas:citas"},
     )
+
+
+@require_POST
+def cita_cambiar_estado(request, pk):
+    nuevo_estado = request.POST.get("estado", "").strip()
+    regreso = request.POST.get("regreso", "citas:citas")
+    try:
+        cita = CitaDAO.cambiar_estado(pk, nuevo_estado)
+        messages.success(
+            request,
+            f"La cita de {cita.mascota.nombre} cambió a {cita.get_estado_display()}.",
+        )
+    except (Cita.DoesNotExist, ValidationError) as error:
+        mensaje = error.messages[0] if hasattr(error, "messages") else str(error)
+        messages.error(request, mensaje)
+    return redirect(regreso if regreso.startswith("citas:") else "citas:citas")

@@ -1,12 +1,15 @@
 from datetime import date, time, timedelta
 from io import StringIO
+from unittest.mock import patch
 
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from .dao import CitaDAO, MascotaDAO, PropietarioDAO, VeterinarioDAO
 from .forms import CitaForm
 from .models import Cita, Mascota, Propietario, Veterinario
 
@@ -206,3 +209,90 @@ class FlujoVetAgendaTests(VetAgendaDatosMixin, TestCase):
         for ruta in rutas:
             with self.subTest(ruta=ruta):
                 self.assertEqual(self.client.get(reverse(ruta)).status_code, 200)
+
+
+class CapaDAOTests(VetAgendaDatosMixin, TestCase):
+    def setUp(self):
+        self.crear_datos_base()
+
+    def crear_cita(self, **cambios):
+        datos = {
+            "mascota": self.mascota,
+            "veterinario": self.veterinario,
+            "fecha": timezone.localdate(),
+            "hora": time(10, 0),
+            "motivo": "Consulta DAO",
+            "estado": Cita.Estado.SOLICITADA,
+        }
+        datos.update(cambios)
+        return Cita.objects.create(**datos)
+
+    def test_propietario_dao_realiza_crud(self):
+        registro = PropietarioDAO.guardar(
+            Propietario(
+                nombre_completo="Carlos Ruiz",
+                telefono="5550001111",
+                email="carlos@example.com",
+            )
+        )
+        self.assertIsNotNone(registro.pk)
+        registro.telefono = "5550002222"
+        PropietarioDAO.guardar(registro)
+        self.assertEqual(
+            PropietarioDAO.obtener_por_id(registro.pk).telefono,
+            "5550002222",
+        )
+        PropietarioDAO.eliminar(registro)
+        self.assertIsNone(PropietarioDAO.obtener_por_id(registro.pk))
+
+    def test_daos_listan_relaciones_y_filtros(self):
+        self.crear_cita(motivo="Vacunación DAO")
+        self.assertEqual(MascotaDAO.listar("Ana López").count(), 1)
+        self.assertEqual(VeterinarioDAO.listar("Sofía").count(), 1)
+        self.assertEqual(CitaDAO.listar("Vacunación").count(), 1)
+        self.assertEqual(CitaDAO.listar(estado=Cita.Estado.SOLICITADA).count(), 1)
+
+    def test_cita_dao_cambia_estado_valido(self):
+        cita = self.crear_cita()
+        actualizada = CitaDAO.cambiar_estado(cita.pk, Cita.Estado.CONFIRMADA)
+        self.assertEqual(actualizada.estado, Cita.Estado.CONFIRMADA)
+        cita.refresh_from_db()
+        self.assertEqual(cita.estado, Cita.Estado.CONFIRMADA)
+
+    def test_cita_dao_rechaza_transicion_invalida(self):
+        cita = self.crear_cita(estado=Cita.Estado.ATENDIDA)
+        with self.assertRaises(ValidationError):
+            CitaDAO.cambiar_estado(cita.pk, Cita.Estado.CONFIRMADA)
+
+    def test_endpoint_retorna_solo_citas_activas_en_json(self):
+        activa = self.crear_cita()
+        self.crear_cita(
+            fecha=timezone.localdate() + timedelta(days=1),
+            estado=Cita.Estado.CANCELADA,
+        )
+        response = self.client.get(reverse("citas:api_citas_activas"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["id"], activa.pk)
+        self.assertEqual(len(response.json()), 1)
+
+    @patch("citas.views.CitaDAO.listar")
+    def test_vista_de_citas_delega_la_consulta_al_dao(self, listar_mock):
+        listar_mock.return_value = []
+        response = self.client.get(
+            reverse("citas:citas"),
+            {"q": "Luna", "estado": Cita.Estado.SOLICITADA},
+        )
+        self.assertEqual(response.status_code, 200)
+        listar_mock.assert_called_once_with("Luna", Cita.Estado.SOLICITADA)
+
+    @patch("citas.views.CitaDAO.cambiar_estado")
+    def test_vista_de_estado_delega_la_actualizacion_al_dao(self, cambiar_mock):
+        cita = self.crear_cita()
+        cita.estado = Cita.Estado.CONFIRMADA
+        cambiar_mock.return_value = cita
+        response = self.client.post(
+            reverse("citas:cita_cambiar_estado", args=[cita.pk]),
+            {"estado": Cita.Estado.CONFIRMADA, "regreso": "citas:agenda_hoy"},
+        )
+        self.assertRedirects(response, reverse("citas:agenda_hoy"))
+        cambiar_mock.assert_called_once_with(cita.pk, Cita.Estado.CONFIRMADA)

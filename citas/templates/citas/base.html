@@ -64,7 +64,8 @@
         th { color: var(--muted); font-size: .76rem; letter-spacing: .08em; text-transform: uppercase; }
         td { font-size: .92rem; }
         tbody tr:last-child td { border-bottom: 0; }
-        .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+        .actions, .inline-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .inline-actions form { margin: 0; }
         .badge { display: inline-flex; padding: 5px 9px; color: var(--teal-dark); background: var(--mint); border-radius: 999px; font-size: .76rem; font-weight: 700; }
         .badge.cancelada { color: #a6473e; background: #fff0ec; }
         .badge.atendida { color: #4e6b4c; background: #e9f4df; }
@@ -102,7 +103,7 @@
     <header class="shell">
         <div class="topbar">
             <a class="brand" href="{% url 'citas:inicio' %}"><span class="brand-mark">✦</span><span>VetAgenda</span></a>
-            <span class="top-note">Gestión veterinaria · Fase 2</span>
+            <span class="top-note">Gestión veterinaria · Fase 4 · View → DAO → ORM</span>
         </div>
         <nav class="nav" aria-label="Navegación principal">
             <a href="{% url 'citas:inicio' %}">Panel</a>
@@ -122,6 +123,6 @@
         {% endif %}
         {% block content %}{% endblock %}
     </main>
-    <footer class="shell">VetAgenda · Proyecto académico de Aplicaciones Web II · Fases 1 y 2</footer>
+    <footer class="shell">VetAgenda · Proyecto académico de Aplicaciones Web II · Fases 1 a 4</footer>
 </body>
 </html>

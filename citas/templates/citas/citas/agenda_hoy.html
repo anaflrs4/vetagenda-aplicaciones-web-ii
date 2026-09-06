@@ -4,21 +4,27 @@
 
 {% block content %}
 <div class="page-heading">
-    <div><div class="eyebrow">Vista del personal veterinario</div><h1>Agenda de hoy</h1><p>Consulta las citas programadas para el {{ fecha|date:"d/m/Y" }}. Esta vista limita la información al día actual.</p></div>
+    <div>
+        <div class="eyebrow">Vista del personal veterinario</div>
+        <h1>Agenda de hoy</h1>
+        <p>Consulta las citas programadas para el {{ fecha|date:"d/m/Y" }}. La información se obtiene mediante CitaDAO y se limita al día actual.</p>
+    </div>
     <a class="button secondary" href="{% url 'citas:citas' %}">Agenda completa</a>
 </div>
 <div class="panel">
     <form class="searchbar" method="get">
         <select name="veterinario" aria-label="Filtrar por veterinario">
             <option value="">Todo el personal activo</option>
-            {% for veterinario in veterinarios %}<option value="{{ veterinario.pk }}" {% if veterinario_id == veterinario.pk|stringformat:'s' %}selected{% endif %}>{{ veterinario.nombre_completo }}</option>{% endfor %}
+            {% for veterinario in veterinarios %}
+            <option value="{{ veterinario.pk }}" {% if veterinario_id == veterinario.pk|stringformat:'s' %}selected{% endif %}>{{ veterinario.nombre_completo }}</option>
+            {% endfor %}
         </select>
         <button class="button" type="submit">Filtrar agenda</button>
         {% if veterinario_id %}<a class="button secondary" href="{% url 'citas:agenda_hoy' %}">Limpiar</a>{% endif %}
     </form>
     {% if registros %}
     <div class="table-wrap"><table>
-        <thead><tr><th>Hora</th><th>Paciente</th><th>Propietario</th><th>Motivo</th><th>Estado</th><th>Acción</th></tr></thead>
+        <thead><tr><th>Hora</th><th>Paciente</th><th>Propietario</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
         <tbody>
             {% for cita in registros %}
             <tr>
@@ -27,7 +33,40 @@
                 <td>{{ cita.mascota.propietario.nombre_completo }}<br><span class="muted">{{ cita.mascota.propietario.telefono }}</span></td>
                 <td>{{ cita.motivo }}</td>
                 <td><span class="badge {{ cita.estado }}">{{ cita.get_estado_display }}</span></td>
-                <td><a class="button secondary small" href="{% url 'citas:cita_editar' cita.pk %}">Actualizar</a></td>
+                <td>
+                    <div class="inline-actions">
+                        {% if cita.estado == "solicitada" %}
+                        <form method="post" action="{% url 'citas:cita_cambiar_estado' cita.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="estado" value="confirmada">
+                            <input type="hidden" name="regreso" value="citas:agenda_hoy">
+                            <button class="button small" type="submit">Confirmar</button>
+                        </form>
+                        <form method="post" action="{% url 'citas:cita_cambiar_estado' cita.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="estado" value="cancelada">
+                            <input type="hidden" name="regreso" value="citas:agenda_hoy">
+                            <button class="button secondary small" type="submit">Cancelar</button>
+                        </form>
+                        {% elif cita.estado == "confirmada" %}
+                        <form method="post" action="{% url 'citas:cita_cambiar_estado' cita.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="estado" value="atendida">
+                            <input type="hidden" name="regreso" value="citas:agenda_hoy">
+                            <button class="button small" type="submit">Marcar atendida</button>
+                        </form>
+                        <form method="post" action="{% url 'citas:cita_cambiar_estado' cita.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="estado" value="cancelada">
+                            <input type="hidden" name="regreso" value="citas:agenda_hoy">
+                            <button class="button secondary small" type="submit">Cancelar</button>
+                        </form>
+                        {% else %}
+                        <span class="muted">Sin cambios disponibles</span>
+                        {% endif %}
+                        <a class="button secondary small" href="{% url 'citas:cita_detalle' cita.pk %}">Ver</a>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

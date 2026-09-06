@@ -1,0 +1,65 @@
+VETAGENDA - RESULTADOS DE PRUEBAS FASE 4
+Fecha de ejecución: 2026-09-06 21:48:55
+
+$ python3 manage.py check
+System check identified no issues (0 silenced).
+
+$ python3 manage.py makemigrations --check --dry-run
+No changes detected
+
+$ python3 manage.py test -v 2
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Found 18 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, rest_framework, staticfiles
+  Apply all migrations: admin, auth, citas, contenttypes, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying citas.0001_initial... OK
+  Applying citas.0002_cita_duracion_minutos... OK
+  Applying citas.0003_remove_cita_cita_unica_por_veterinario_horario_and_more... OK
+  Applying sessions.0001_initial...test_cita_dao_cambia_estado_valido (citas.tests.CapaDAOTests.test_cita_dao_cambia_estado_valido) ... ok
+test_cita_dao_rechaza_transicion_invalida (citas.tests.CapaDAOTests.test_cita_dao_rechaza_transicion_invalida) ... ok
+test_daos_listan_relaciones_y_filtros (citas.tests.CapaDAOTests.test_daos_listan_relaciones_y_filtros) ... ok
+test_endpoint_retorna_solo_citas_activas_en_json (citas.tests.CapaDAOTests.test_endpoint_retorna_solo_citas_activas_en_json) ... ok
+test_propietario_dao_realiza_crud (citas.tests.CapaDAOTests.test_propietario_dao_realiza_crud) ... ok
+test_vista_de_citas_delega_la_consulta_al_dao (citas.tests.CapaDAOTests.test_vista_de_citas_delega_la_consulta_al_dao) ... ok
+test_vista_de_estado_delega_la_actualizacion_al_dao (citas.tests.CapaDAOTests.test_vista_de_estado_delega_la_actualizacion_al_dao) ... ok
+test_configurar_roles_crea_grupos_y_permisos (citas.tests.FlujoVetAgendaTests.test_configurar_roles_crea_grupos_y_permisos) ... ok
+test_el_dashboard_muestra_el_resumen_por_estado (citas.tests.FlujoVetAgendaTests.test_el_dashboard_muestra_el_resumen_por_estado) ... ok
+test_el_listado_de_mascotas_muestra_propietario (citas.tests.FlujoVetAgendaTests.test_el_listado_de_mascotas_muestra_propietario) ... ok
+test_el_listado_filtra_por_estado (citas.tests.FlujoVetAgendaTests.test_el_listado_filtra_por_estado) ... ok
+test_la_agenda_hoy_solo_muestra_la_fecha_actual (citas.tests.FlujoVetAgendaTests.test_la_agenda_hoy_solo_muestra_la_fecha_actual) ... ok
+test_las_secciones_principales_cargan (citas.tests.FlujoVetAgendaTests.test_las_secciones_principales_cargan) ... ok
+test_se_puede_registrar_una_cita_desde_la_vista (citas.tests.FlujoVetAgendaTests.test_se_puede_registrar_una_cita_desde_la_vista) ... ok
+test_la_pagina_inicial_responde (citas.tests.InicioVetAgendaTests.test_la_pagina_inicial_responde) ... ok
+test_el_formulario_rechaza_horario_duplicado (citas.tests.ModelosVetAgendaTests.test_el_formulario_rechaza_horario_duplicado) ... ok
+test_el_formulario_rechaza_solapamiento_parcial (citas.tests.ModelosVetAgendaTests.test_el_formulario_rechaza_solapamiento_parcial) ... ok
+test_la_cita_se_relaciona_con_mascota_y_veterinario (citas.tests.ModelosVetAgendaTests.test_la_cita_se_relaciona_con_mascota_y_veterinario) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.238s
+
+OK
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+ OK
+System check identified no issues (0 silenced).

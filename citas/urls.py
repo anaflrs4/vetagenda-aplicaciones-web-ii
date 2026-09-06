@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .api_views import CitasActivasAPIView
 
 
 app_name = "citas"
@@ -48,5 +49,11 @@ urlpatterns = [
     path("citas/nueva/", views.cita_nueva, name="cita_nueva"),
     path("citas/<int:pk>/", views.cita_detalle, name="cita_detalle"),
     path("citas/<int:pk>/editar/", views.cita_editar, name="cita_editar"),
+    path(
+        "citas/<int:pk>/estado/",
+        views.cita_cambiar_estado,
+        name="cita_cambiar_estado",
+    ),
     path("citas/<int:pk>/eliminar/", views.cita_eliminar, name="cita_eliminar"),
+    path("api/citas/activas/", CitasActivasAPIView.as_view(), name="api_citas_activas"),
 ]

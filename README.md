@@ -2,7 +2,7 @@
 
 **VetAgenda** es una aplicación web académica para organizar la información de una clínica veterinaria pequeña. Centraliza propietarios, mascotas, veterinarios y citas en un solo lugar, con una estructura preparada para crecer durante las siguientes fases de Aplicaciones Web II.
 
-> Esta entrega integra las **fases 1, 2 y 3**. La fase 1 contiene la investigación, el análisis del problema, los objetivos y el diseño preliminar. La fase 2 incorpora modelos Django, migraciones, formularios, vistas, rutas, plantillas, panel administrativo y operaciones básicas. La fase 3 documenta el modelo físico, la conexión con el backend, los roles y permisos, la recreación de datos y las pruebas de humo.
+> Esta entrega integra las **fases 1 a 4**. La fase 1 contiene la investigación y el análisis; la fase 2 incorpora el primer avance funcional; la fase 3 consolida el modelo físico, los roles, la recreación de datos y las pruebas de humo; y la fase 4 implementa la arquitectura **View → DAO → ORM → base de datos**, conecta el frontend con el backend y prueba el DAO y el endpoint REST.
 
 ## Problemática
 
@@ -42,9 +42,16 @@ Los datos incluidos con el comando de demostración son ficticios. No se utiliza
 
 Las reglas de acceso, los estados y la gestión de horarios están documentadas en `docs/reglas-acceso-horarios.md`. En la fase actual se incluye la vista `/citas/hoy/` como aproximación a la agenda diaria del personal veterinario; la autenticación por usuario y los permisos específicos se implementarán cuando correspondan a una fase posterior.
 
-## Tecnologías
+## Arquitectura y tecnologías
 
-El proyecto utiliza **Python**, **Django 5.2** y **Django REST Framework**. La fase actual utiliza las vistas y formularios de Django para demostrar el flujo web y deja preparado el proyecto para incorporar serializers y endpoints de API cuando sean solicitados en clases posteriores. La base de datos local de desarrollo utiliza SQLite.
+El proyecto utiliza **Python**, **Django 5.2**, **Django REST Framework** y SQLite. Desde la fase 4, las vistas no consultan directamente `Modelo.objects`; delegan las operaciones en `citas/dao.py`. La ruta `/api/citas/activas/` responde en JSON mediante `CitasActivasAPIView`, `CitaDAO` y `CitaSerializer`.
+
+| Flujo | Implementación |
+|---|---|
+| Interfaz → vista | Plantillas y formularios envían solicitudes GET o POST. |
+| Vista → DAO | `views.py` y `api_views.py` llaman a los métodos DAO. |
+| DAO → ORM | `dao.py` centraliza consultas, guardado, eliminación y estados. |
+| ORM → datos | Los modelos y migraciones persisten la información en SQLite. |
 
 ## Estructura principal
 
@@ -63,18 +70,26 @@ vetagenda/
 │   │   ├── veterinarios/lista.html
 │   │   └── citas/{lista,detalle}.html
 │   ├── admin.py
+│   ├── api_views.py
+│   ├── dao.py
 │   ├── forms.py
 │   ├── models.py
+│   ├── serializers.py
 │   ├── tests.py
 │   ├── urls.py
 │   └── views.py
 ├── docs/
 │   ├── assets/{dashboard-fase-3,agenda-hoy-fase-3}.webp
+│   ├── assets/fase4/{agenda-dao-antes,agenda-dao-atendida,api-citas-activas-200}.png
+│   ├── diagrama-dao-fase4.{mmd,png}
+│   ├── ProyectoFases1a4_VetAgenda_integrado.docx
 │   ├── entrega-fase-3-vetagenda.md
+│   ├── entrega-fase-4-vetagenda.md
 │   ├── entrega-fases-1-y-2-vetagenda.md
 │   ├── fase-1-analisis-vetagenda.md
 │   ├── reglas-acceso-horarios.md
 │   ├── pruebas-humo-fase-3.md
+│   ├── resultados-pruebas-fase4.txt
 │   ├── sql-schema-citas.sql
 │   └── verificacion-fase-2.md
 ├── vetagenda/
@@ -106,7 +121,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Abre `http://127.0.0.1:8000/` para ver el panel de VetAgenda. La agenda diaria se encuentra en `http://127.0.0.1:8000/citas/hoy/`.
+Abre `http://127.0.0.1:8000/` para ver el panel de VetAgenda. La agenda diaria se encuentra en `http://127.0.0.1:8000/citas/hoy/` y el endpoint REST en `http://127.0.0.1:8000/api/citas/activas/`.
 
 ### Datos ficticios y roles para la demostración
 
@@ -126,7 +141,7 @@ Después abre `http://127.0.0.1:8000/admin/` e inicia sesión con las credencial
 
 ## Pruebas
 
-El proyecto incluye once pruebas para la pantalla inicial, las relaciones del modelo, la validación de horarios duplicados y solapados, el registro de citas, el filtro por estado, el listado de mascotas, la agenda diaria, el resumen del dashboard y la creación de grupos y permisos. La bitácora de pruebas de humo de fase 3 se encuentra en `docs/pruebas-humo-fase-3.md`. Para ejecutarlas:
+El proyecto incluye **18 pruebas**. Además de la cobertura anterior, la fase 4 verifica el CRUD mediante DAO, las búsquedas, las transiciones válidas e inválidas de las citas, la respuesta JSON con código 200 y la delegación de las vistas a `CitaDAO` mediante mocks. El resultado detallado se encuentra en `docs/resultados-pruebas-fase4.txt` y el informe ejecutivo en `docs/entrega-fase-4-vetagenda.md`.
 
 ```bash
 python manage.py check
@@ -135,7 +150,7 @@ python manage.py test
 
 ## Alcance y siguientes fases
 
-Esta entrega no incluye pagos, notificaciones automáticas, despliegue en producción, aplicación móvil, historial clínico completo, autenticación específica por rol ni una API REST completa. Estas funciones se reservarán para las siguientes fases, conforme a las instrucciones de la asignatura.
+Esta entrega no incluye pagos, notificaciones automáticas, despliegue en producción, aplicación móvil, historial clínico completo ni autenticación específica por usuario. La API actual es un endpoint académico de solo lectura para citas activas; una API completa con autenticación se reserva para fases posteriores.
 
 ## Referencias
 
@@ -148,3 +163,7 @@ Esta entrega no incluye pagos, notificaciones automáticas, despliegue en produc
 [4]: https://us06web.zoom.us/rec/play/iKp5n7O_5voheVRrxfJtCvflme7mhAYgQG97BvdgBn_uSK8KGR2Du5IjH6rL7EzbfSpKVlhbAuW15ELP.jlYE_ZpxAzER5lmZ "Grabación de Aplicaciones Web II del 20 de agosto de 2026."
 
 [5]: https://github.com/anaflrs4/vetagenda-aplicaciones-web-ii "Repositorio público de VetAgenda."
+
+[6]: https://us06web.zoom.us/rec/play/KrKLTlejmLr_Wr_nF2ek7J17GzoG7nBGGR2RSuVOUaGcoRTTXhYz4DVyN-_Yegg7Kj2nKLCMPraqRt-n.yUahetpjyQQ9TuWy "Grabación de Aplicaciones Web II del 2 de septiembre de 2026."
+
+[7]: https://us06web.zoom.us/rec/play/2dkhOqlC_l-ie2o3s9Q1CikNpzunutbO-aQ8inISwa6hrev4QEyXhHOo3NKe0HggDPLAt4eriiB87bQa.yytVfQ4KGNp7pp4t "Grabación de Aplicaciones Web II del 3 de septiembre de 2026."

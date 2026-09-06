@@ -4,7 +4,11 @@
 
 {% block content %}
 <div class="page-heading">
-    <div><div class="eyebrow">Agenda clínica</div><h1>Citas</h1><p>Organiza las consultas y da seguimiento a su estado.</p></div>
+    <div>
+        <div class="eyebrow">Agenda clínica · View → DAO → ORM</div>
+        <h1>Citas</h1>
+        <p>Organiza las consultas y actualiza su estado mediante la capa de acceso a datos.</p>
+    </div>
     <a class="button" href="{% url 'citas:cita_nueva' %}">+ Nueva cita</a>
 </div>
 <div class="panel">
@@ -23,12 +27,27 @@
         <tbody>
             {% for cita in registros %}
             <tr>
-                <td><strong>{{ cita.fecha|date:"d/m/Y" }}</strong><br><span class="muted">{{ cita.hora|time:"H:i" }}</span></td>
+                <td><strong>{{ cita.fecha|date:"d/m/Y" }}</strong><br><span class="muted">{{ cita.hora|time:"H:i" }}–{{ cita.hora_fin|time:"H:i" }}</span></td>
                 <td><strong>{{ cita.mascota.nombre }}</strong><br><span class="muted">{{ cita.mascota.propietario.nombre_completo }}</span></td>
                 <td>{{ cita.veterinario.nombre_completo }}</td>
                 <td>{{ cita.motivo }}</td>
                 <td><span class="badge {{ cita.estado }}">{{ cita.get_estado_display }}</span></td>
-                <td><div class="actions"><a class="button secondary small" href="{% url 'citas:cita_detalle' cita.pk %}">Ver</a><a class="button secondary small" href="{% url 'citas:cita_editar' cita.pk %}">Editar</a><a class="button danger small" href="{% url 'citas:cita_eliminar' cita.pk %}">Eliminar</a></div></td>
+                <td><div class="actions">
+                    {% if cita.estado == "solicitada" %}
+                    <form method="post" action="{% url 'citas:cita_cambiar_estado' cita.pk %}">
+                        {% csrf_token %}<input type="hidden" name="estado" value="confirmada"><input type="hidden" name="regreso" value="citas:citas">
+                        <button class="button small" type="submit">Confirmar</button>
+                    </form>
+                    {% elif cita.estado == "confirmada" %}
+                    <form method="post" action="{% url 'citas:cita_cambiar_estado' cita.pk %}">
+                        {% csrf_token %}<input type="hidden" name="estado" value="atendida"><input type="hidden" name="regreso" value="citas:citas">
+                        <button class="button small" type="submit">Atendida</button>
+                    </form>
+                    {% endif %}
+                    <a class="button secondary small" href="{% url 'citas:cita_detalle' cita.pk %}">Ver</a>
+                    <a class="button secondary small" href="{% url 'citas:cita_editar' cita.pk %}">Editar</a>
+                    <a class="button danger small" href="{% url 'citas:cita_eliminar' cita.pk %}">Eliminar</a>
+                </div></td>
             </tr>
             {% endfor %}
         </tbody>

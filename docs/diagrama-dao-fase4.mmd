@@ -1,0 +1,18 @@
+flowchart LR
+    U[Usuario] --> F[Plantillas y formularios HTML]
+    F --> V[Vistas Django]
+    V --> D[Capa DAO\nPropietarioDAO\nMascotaDAO\nVeterinarioDAO\nCitaDAO]
+    D --> O[ORM de Django]
+    O --> B[(Base de datos SQLite)]
+    V --> A[Endpoint REST]
+    A --> D
+    D --> R[Resultados y entidades]
+    R --> V
+    V --> F
+
+    classDef frontend fill:#e8f6f3,stroke:#0e766d,color:#172a32;
+    classDef backend fill:#fff3cc,stroke:#d6a832,color:#172a32;
+    classDef data fill:#f2e9ff,stroke:#7451a6,color:#172a32;
+    class U,F frontend;
+    class V,D,A backend;
+    class O,B,R data;
