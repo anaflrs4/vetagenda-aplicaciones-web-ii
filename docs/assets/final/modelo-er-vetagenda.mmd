@@ -1,0 +1,44 @@
+erDiagram
+    PROPIETARIO ||--o{ MASCOTA : registra
+    MASCOTA ||--o{ CITA : tiene
+    VETERINARIO ||--o{ CITA : atiende
+
+    PROPIETARIO {
+        int id PK
+        string nombre_completo
+        string telefono
+        string email
+        datetime fecha_registro
+    }
+
+    MASCOTA {
+        int id PK
+        int propietario_id FK
+        string nombre
+        string especie
+        string raza
+        date fecha_nacimiento
+        decimal peso_kg
+        text notas
+    }
+
+    VETERINARIO {
+        int id PK
+        string nombre_completo
+        string especialidad
+        string telefono
+        string email
+        boolean activo
+    }
+
+    CITA {
+        int id PK
+        int mascota_id FK
+        int veterinario_id FK
+        date fecha
+        time hora
+        int duracion_minutos
+        string motivo
+        string estado
+        text observaciones
+    }

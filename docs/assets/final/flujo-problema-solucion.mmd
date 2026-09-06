@@ -1,0 +1,17 @@
+flowchart LR
+    A[Registros dispersos<br/>libretas, mensajes y archivos] --> B[Información duplicada<br/>o difícil de localizar]
+    A --> C[Agenda manual<br/>y riesgo de cruces]
+    A --> D[Poca claridad sobre<br/>el estado de la cita]
+    B --> E[VetAgenda]
+    C --> E
+    D --> E
+    E --> F[Datos centralizados]
+    E --> G[Agenda organizada]
+    E --> H[Seguimiento por estados]
+
+    classDef problem fill:#FCE8E6,stroke:#C96A5B,color:#542C25,stroke-width:1px;
+    classDef solution fill:#E0F2EE,stroke:#0F766E,color:#134E4A,stroke-width:1.5px;
+    classDef benefit fill:#EEF6F4,stroke:#5F9E94,color:#174C47,stroke-width:1px;
+    class A,B,C,D problem;
+    class E solution;
+    class F,G,H benefit;

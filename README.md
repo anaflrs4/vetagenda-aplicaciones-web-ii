@@ -83,6 +83,7 @@ vetagenda/
 │   ├── assets/fase4/{agenda-dao-antes,agenda-dao-atendida,api-citas-activas-200}.png
 │   ├── diagrama-dao-fase4.{mmd,png}
 │   ├── ProyectoFases1a4_VetAgenda_integrado.docx
+│   ├── VetAgenda_Fases1a4_Profesional.docx        # Documento principal recomendado
 │   ├── entrega-fase-3-vetagenda.md
 │   ├── entrega-fase-4-vetagenda.md
 │   ├── entrega-fases-1-y-2-vetagenda.md
