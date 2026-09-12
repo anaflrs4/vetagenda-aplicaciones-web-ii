@@ -84,8 +84,9 @@ vetagenda/
 │   ├── diagrama-dao-fase4.{mmd,png}
 │   ├── ProyectoFases1a4_VetAgenda_integrado.docx
 │   ├── VetAgenda_Fases1a4_Profesional.docx
-│   ├── VetAgenda_Proyecto_Final_Lineamientos_EBC.docx  # Informe final recomendado
-│   ├── VetAgenda_Manual_de_Usuario.docx                 # Manual independiente
+│   ├── VetAgenda_Proyecto_Final_Paleta_Referencia.docx  # Informe final recomendado
+│   ├── VetAgenda_Proyecto_Final_Lineamientos_EBC.docx    # Versión previa
+│   ├── VetAgenda_Manual_de_Usuario.docx                  # Manual independiente
 │   ├── entrega-fase-3-vetagenda.md
 │   ├── entrega-fase-4-vetagenda.md
 │   ├── entrega-fases-1-y-2-vetagenda.md
