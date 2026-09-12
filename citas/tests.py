@@ -296,3 +296,77 @@ class CapaDAOTests(VetAgendaDatosMixin, TestCase):
         )
         self.assertRedirects(response, reverse("citas:agenda_hoy"))
         cambiar_mock.assert_called_once_with(cita.pk, Cita.Estado.CONFIRMADA)
+
+
+class FlujoExtremoAExtremoTests(TestCase):
+    """Prueba el recorrido completo del usuario desde las vistas hasta la API."""
+
+    def test_crud_y_estado_de_cita_de_extremo_a_extremo(self):
+        respuesta = self.client.post(
+            reverse("citas:propietario_nuevo"),
+            {
+                "nombre_completo": "Laura Méndez",
+                "telefono": "5558881122",
+                "email": "laura@example.com",
+            },
+        )
+        self.assertRedirects(respuesta, reverse("citas:propietarios"))
+        propietario = Propietario.objects.get(email="laura@example.com")
+
+        respuesta = self.client.post(
+            reverse("citas:mascota_nueva"),
+            {
+                "propietario": propietario.pk,
+                "nombre": "Milo",
+                "especie": Mascota.Especie.PERRO,
+                "raza": "Mestizo",
+                "fecha_nacimiento": "2022-04-10",
+                "peso_kg": "12.40",
+                "notas": "Paciente de prueba E2E.",
+            },
+        )
+        self.assertRedirects(respuesta, reverse("citas:mascotas"))
+        mascota = Mascota.objects.get(nombre="Milo")
+
+        veterinario = Veterinario.objects.create(
+            nombre_completo="Dr. Luis Romero",
+            especialidad="Medicina preventiva",
+            activo=True,
+        )
+        fecha = timezone.localdate() + timedelta(days=2)
+        respuesta = self.client.post(
+            reverse("citas:cita_nueva"),
+            {
+                "mascota": mascota.pk,
+                "veterinario": veterinario.pk,
+                "fecha": fecha.isoformat(),
+                "hora": "12:00",
+                "duracion_minutos": 30,
+                "motivo": "Flujo E2E",
+                "estado": Cita.Estado.SOLICITADA,
+                "observaciones": "Registro de prueba integral.",
+            },
+        )
+        self.assertRedirects(respuesta, reverse("citas:citas"))
+        cita = Cita.objects.get(motivo="Flujo E2E")
+
+        respuesta = self.client.post(
+            reverse("citas:cita_cambiar_estado", args=[cita.pk]),
+            {"estado": Cita.Estado.CONFIRMADA, "regreso": "citas:citas"},
+        )
+        self.assertRedirects(respuesta, reverse("citas:citas"))
+        cita.refresh_from_db()
+        self.assertEqual(cita.estado, Cita.Estado.CONFIRMADA)
+
+        respuesta_api = self.client.get(reverse("citas:api_citas_activas"))
+        self.assertEqual(respuesta_api.status_code, 200)
+        self.assertEqual(respuesta_api.json()[0]["mascota_nombre"], "Milo")
+
+        respuesta = self.client.post(
+            reverse("citas:cita_cambiar_estado", args=[cita.pk]),
+            {"estado": Cita.Estado.ATENDIDA, "regreso": "citas:citas"},
+        )
+        self.assertRedirects(respuesta, reverse("citas:citas"))
+        cita.refresh_from_db()
+        self.assertEqual(cita.estado, Cita.Estado.ATENDIDA)
+        self.assertEqual(self.client.get(reverse("citas:api_citas_activas")).json(), [])

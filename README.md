@@ -2,7 +2,7 @@
 
 **VetAgenda** es una aplicación web académica para organizar la información de una clínica veterinaria pequeña. Centraliza propietarios, mascotas, veterinarios y citas en un solo lugar, con una estructura preparada para crecer durante las siguientes fases de Aplicaciones Web II.
 
-> Esta entrega integra las **fases 1 a 4**. La fase 1 contiene la investigación y el análisis; la fase 2 incorpora el primer avance funcional; la fase 3 consolida el modelo físico, los roles, la recreación de datos y las pruebas de humo; y la fase 4 implementa la arquitectura **View → DAO → ORM → base de datos**, conecta el frontend con el backend y prueba el DAO y el endpoint REST.
+> Esta entrega final integra las **fases 1 a 4** y los lineamientos generales del proyecto. Incluye análisis, requerimientos, diseño, modelo de datos, backend, frontend, arquitectura **View → DAO → ORM → base de datos**, endpoint REST, aseguramiento de calidad, proceso de liberación, manual de usuario y presentación ejecutiva.
 
 ## Problemática
 
@@ -83,7 +83,9 @@ vetagenda/
 │   ├── assets/fase4/{agenda-dao-antes,agenda-dao-atendida,api-citas-activas-200}.png
 │   ├── diagrama-dao-fase4.{mmd,png}
 │   ├── ProyectoFases1a4_VetAgenda_integrado.docx
-│   ├── VetAgenda_Fases1a4_Profesional.docx        # Documento principal recomendado
+│   ├── VetAgenda_Fases1a4_Profesional.docx
+│   ├── VetAgenda_Proyecto_Final_Lineamientos_EBC.docx  # Informe final recomendado
+│   ├── VetAgenda_Manual_de_Usuario.docx                 # Manual independiente
 │   ├── entrega-fase-3-vetagenda.md
 │   ├── entrega-fase-4-vetagenda.md
 │   ├── entrega-fases-1-y-2-vetagenda.md
@@ -91,6 +93,7 @@ vetagenda/
 │   ├── reglas-acceso-horarios.md
 │   ├── pruebas-humo-fase-3.md
 │   ├── resultados-pruebas-fase4.txt
+│   ├── resultados-pruebas-proyecto-final.txt
 │   ├── sql-schema-citas.sql
 │   └── verificacion-fase-2.md
 ├── vetagenda/
@@ -99,6 +102,8 @@ vetagenda/
 │   ├── asgi.py
 │   └── wsgi.py
 ├── .gitignore
+├── build.sh
+├── render.yaml
 ├── manage.py
 ├── requirements.txt
 └── README.md
@@ -142,16 +147,23 @@ Después abre `http://127.0.0.1:8000/admin/` e inicia sesión con las credencial
 
 ## Pruebas
 
-El proyecto incluye **18 pruebas**. Además de la cobertura anterior, la fase 4 verifica el CRUD mediante DAO, las búsquedas, las transiciones válidas e inválidas de las citas, la respuesta JSON con código 200 y la delegación de las vistas a `CitaDAO` mediante mocks. El resultado detallado se encuentra en `docs/resultados-pruebas-fase4.txt` y el informe ejecutivo en `docs/entrega-fase-4-vetagenda.md`.
+El proyecto incluye **19 pruebas aprobadas**. La suite cubre reglas y modelos, CRUD mediante DAO, búsquedas, transiciones válidas e inválidas, respuesta JSON con HTTP 200 y delegación de vistas mediante mocks. La prueba E2E final recorre el alta de propietario y mascota, la creación de una cita, su confirmación, la consulta por API y el cierre como atendida. El resultado detallado se encuentra en `docs/resultados-pruebas-proyecto-final.txt`.
 
 ```bash
 python manage.py check
+python manage.py makemigrations --check --dry-run
 python manage.py test
 ```
 
-## Alcance y siguientes fases
+## Despliegue
 
-Esta entrega no incluye pagos, notificaciones automáticas, despliegue en producción, aplicación móvil, historial clínico completo ni autenticación específica por usuario. La API actual es un endpoint académico de solo lectura para citas activas; una API completa con autenticación se reserva para fases posteriores.
+La aplicación mantiene SQLite para el entorno local y acepta `DATABASE_URL` para PostgreSQL. `settings.py` utiliza variables de entorno para `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS` y orígenes CSRF; WhiteNoise atiende archivos estáticos y Gunicorn ejecuta WSGI. El manifiesto `render.yaml` y `build.sh` permiten crear la base, aplicar migraciones, recopilar estáticos y configurar roles en un proveedor compatible.
+
+Antes de activar producción, revisa las variables del servicio y genera una clave secreta. El despliegue puede iniciarse desde el panel de Render conectando este repositorio y seleccionando el Blueprint incluido. La URL productiva se documentará una vez que la cuenta de despliegue haya sido autorizada.
+
+## Alcance y evolución
+
+La versión final contiene el CRUD del dominio, dashboard, agenda diaria, validación de solapamientos, DAO, ORM, endpoint REST, 19 pruebas y configuración reproducible de despliegue. No incluye pagos, notificaciones automáticas, aplicación móvil, historial clínico completo ni autenticación personalizada en las pantallas del dominio. La API actual es un endpoint académico de solo lectura para citas activas; una API completa y autenticada se considera una evolución posterior.
 
 ## Referencias
 
