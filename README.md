@@ -157,9 +157,9 @@ python manage.py test
 
 ## Despliegue
 
-La aplicación mantiene SQLite para el entorno local y acepta `DATABASE_URL` para PostgreSQL. `settings.py` utiliza variables de entorno para `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS` y orígenes CSRF; WhiteNoise atiende archivos estáticos y Gunicorn ejecuta WSGI. El manifiesto `render.yaml` y `build.sh` permiten crear la base, aplicar migraciones, recopilar estáticos y configurar roles en un proveedor compatible.
+La aplicación mantiene SQLite para el entorno local y acepta `DATABASE_URL` para PostgreSQL. `settings.py` utiliza variables de entorno para `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS` y orígenes CSRF; WhiteNoise atiende archivos estáticos y Gunicorn ejecuta WSGI. El manifiesto `render.yaml` y `build.sh` permiten crear la base, aplicar migraciones, recopilar estáticos, configurar roles y cargar datos ficticios de demostración de manera idempotente en el ambiente académico.
 
-Antes de activar producción, revisa las variables del servicio y genera una clave secreta. El despliegue puede iniciarse desde el panel de Render conectando este repositorio y seleccionando el Blueprint incluido. La URL productiva se documentará una vez que la cuenta de despliegue haya sido autorizada.
+La versión productiva académica está disponible en **https://vetagenda.onrender.com/**. Render utiliza el Blueprint incluido, PostgreSQL y variables seguras. Al utilizar el plan gratuito, la primera visita después de un periodo de inactividad puede tardar mientras la instancia se reactiva.
 
 ## Alcance y evolución
 

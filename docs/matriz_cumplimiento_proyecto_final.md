@@ -2,7 +2,7 @@
 
 ## Síntesis
 
-La entrega final cubre los lineamientos de análisis, diseño, datos, backend, frontend, calidad, liberación, manual y presentación. La arquitectura aprobada por la docente se conserva. El único requisito que requiere una acción externa de la estudiante es activar el servicio de alojamiento para obtener la liga productiva; el repositorio ya contiene la configuración reproducible necesaria.
+La entrega final cubre los lineamientos de análisis, diseño, datos, backend, frontend, calidad, liberación, manual, presentación y ambiente productivo. La arquitectura aprobada por la docente se conserva y la aplicación se encuentra desplegada mediante HTTPS.
 
 | Bloque | Requisito | Estado final | Evidencia principal |
 |---|---|---|---|
@@ -41,8 +41,8 @@ La entrega final cubre los lineamientos de análisis, diseño, datos, backend, f
 | Final | Presentación y speech de venta | Cumple | Presentación ejecutiva y `VetAgenda_Speech_de_Venta.md`. |
 | Final | Repositorio/código | Cumple | Repositorio público y paquete ZIP. |
 | Final | Preparación productiva | Cumple | `render.yaml`, `build.sh`, Gunicorn, WhiteNoise y PostgreSQL por URL. |
-| Final | Liga productiva | Pendiente de autorización | Requiere iniciar sesión en el proveedor y activar el Blueprint. |
+| Final | Liga productiva | Cumple | https://vetagenda.onrender.com/; dashboard, CRUD, agenda y API con HTTP 200. |
 
 ## Conclusión de revisión
 
-El proyecto se encuentra técnicamente listo para desplegar. No se presenta la URL local como si fuera productiva y no se inventa una liga externa. Una vez que la estudiante autorice el proveedor, el Blueprint del repositorio puede crear el servicio y la base PostgreSQL; después deberá incorporarse esa URL al informe antes de la entrega definitiva si la rúbrica la exige de forma obligatoria.
+El proyecto se encuentra desplegado en `https://vetagenda.onrender.com/` mediante un Blueprint versionado. El servicio utiliza PostgreSQL, Gunicorn, WhiteNoise y variables de entorno. Se verificaron con HTTP 200 el dashboard, los módulos de propietarios, mascotas, veterinarios y citas, la agenda diaria y el endpoint REST.
