@@ -210,6 +210,24 @@ class FlujoVetAgendaTests(VetAgendaDatosMixin, TestCase):
             with self.subTest(ruta=ruta):
                 self.assertEqual(self.client.get(reverse(ruta)).status_code, 200)
 
+    def test_formulario_cita_muestra_nombres_y_guia(self):
+        response = self.client.get(reverse("citas:cita_nueva"))
+        self.assertContains(response, "Los nombres se seleccionan de registros existentes")
+        self.assertContains(response, "Luna")
+        self.assertContains(response, "Dra. Sofía Torres")
+        self.assertContains(response, "Registrar propietario")
+        self.assertContains(response, "Registrar mascota")
+        self.assertContains(response, "Registrar veterinario")
+
+
+class FormularioCitaVacioTests(TestCase):
+    def test_formulario_advierte_cuando_faltan_registros(self):
+        response = self.client.get(reverse("citas:cita_nueva"))
+        self.assertContains(response, "Aún faltan datos para completar la cita")
+        self.assertContains(response, "propietario")
+        self.assertContains(response, "mascota")
+        self.assertContains(response, "veterinario")
+
 
 class CapaDAOTests(VetAgendaDatosMixin, TestCase):
     def setUp(self):

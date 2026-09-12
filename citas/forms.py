@@ -59,6 +59,17 @@ class VeterinarioForm(FormularioBase):
 
 
 class CitaForm(FormularioBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["mascota"].empty_label = "Selecciona una mascota registrada"
+        self.fields["mascota"].help_text = (
+            "El nombre del propietario se obtiene automáticamente de la ficha de la mascota."
+        )
+        self.fields["veterinario"].empty_label = "Selecciona un veterinario registrado"
+        self.fields["veterinario"].help_text = (
+            "Primero registra al personal veterinario para que aparezca en esta lista."
+        )
+
     class Meta:
         model = Cita
         fields = [

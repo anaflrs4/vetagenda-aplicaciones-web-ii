@@ -270,8 +270,15 @@ def cita_nueva(request):
         {
             "form": form,
             "titulo": "Registrar cita",
-            "descripcion": "Agenda una consulta y asígnala a un veterinario.",
+            "descripcion": (
+                "Selecciona una mascota registrada y un veterinario. "
+                "El nombre del propietario se toma automáticamente de la mascota."
+            ),
             "volver": "citas:citas",
+            "flujo_cita": True,
+            "sin_propietarios": PropietarioDAO.contar() == 0,
+            "sin_mascotas": MascotaDAO.contar() == 0,
+            "sin_veterinarios": VeterinarioDAO.contar_activos() == 0,
         },
     )
 

@@ -147,7 +147,7 @@ Después abre `http://127.0.0.1:8000/admin/` e inicia sesión con las credencial
 
 ## Pruebas
 
-El proyecto incluye **19 pruebas aprobadas**. La suite cubre reglas y modelos, CRUD mediante DAO, búsquedas, transiciones válidas e inválidas, respuesta JSON con HTTP 200 y delegación de vistas mediante mocks. La prueba E2E final recorre el alta de propietario y mascota, la creación de una cita, su confirmación, la consulta por API y el cierre como atendida. El resultado detallado se encuentra en `docs/resultados-pruebas-proyecto-final.txt`.
+El proyecto incluye **21 pruebas aprobadas**. La suite cubre reglas y modelos, CRUD mediante DAO, búsquedas, transiciones válidas e inválidas, respuesta JSON con HTTP 200, delegación de vistas mediante mocks y la guía de registros previos del formulario de citas. La prueba E2E final recorre el alta de propietario y mascota, la creación de una cita, su confirmación, la consulta por API y el cierre como atendida. El resultado detallado se encuentra en `docs/resultados-pruebas-proyecto-final.txt`.
 
 ```bash
 python manage.py check
@@ -163,7 +163,7 @@ La versión productiva académica está disponible en **https://vetagenda.onrend
 
 ## Alcance y evolución
 
-La versión final contiene el CRUD del dominio, dashboard, agenda diaria, validación de solapamientos, DAO, ORM, endpoint REST, 19 pruebas y configuración reproducible de despliegue. No incluye pagos, notificaciones automáticas, aplicación móvil, historial clínico completo ni autenticación personalizada en las pantallas del dominio. La API actual es un endpoint académico de solo lectura para citas activas; una API completa y autenticada se considera una evolución posterior.
+La versión final contiene el CRUD del dominio, dashboard, agenda diaria, validación de solapamientos, DAO, ORM, endpoint REST, 21 pruebas y configuración reproducible de despliegue. No incluye pagos, notificaciones automáticas, aplicación móvil, historial clínico completo ni autenticación personalizada en las pantallas del dominio. La API actual es un endpoint académico de solo lectura para citas activas; una API completa y autenticada se considera una evolución posterior.
 
 ## Referencias
 

@@ -1,22 +1,14 @@
-VETAGENDA · VERIFICACIÓN DEL PROYECTO FINAL
-Fecha UTC: 2026-09-12 02:43:06
+VETAGENDA — VALIDACIÓN DEL FORMULARIO DE CITAS
+Fecha UTC: 2026-09-12 03:22:32
 
-$ DEBUG=False python3 manage.py check --deploy
 System check identified no issues (0 silenced).
-
-$ python3 manage.py check
-System check identified no issues (0 silenced).
-
-$ python3 manage.py makemigrations --check --dry-run
 No changes detected
-
-$ python3 manage.py test -v 1
 Creating test database for alias 'default'...
-...................
+.....................
 ----------------------------------------------------------------------
-Ran 19 tests in 0.794s
+Ran 21 tests in 0.962s
 
 OK
 Destroying test database for alias 'default'...
-Found 19 test(s).
+Found 21 test(s).
 System check identified no issues (0 silenced).
